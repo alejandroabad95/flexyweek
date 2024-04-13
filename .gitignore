@@ -1,0 +1,22 @@
+# Archivos de configuración locales
+*.pyc
+*.sqlite3
+*.pyo
+*.pyc
+__pycache__/
+
+# Carpeta de entorno virtual (si utilizas uno)
+venv/
+
+# Carpeta de archivos estáticos compilados
+staticfiles/
+
+# Carpeta de archivos temporales
+*.log
+
+# Archivos generados por IDEs o editores de texto
+.vscode/
+.idea/
+*.pyc
+*.pyo
+*.pyc
