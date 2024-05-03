@@ -1,0 +1,39 @@
+html {
+
+}
+
+.App {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  /* Centra los elementos horizontalmente */
+  justify-content: center;
+  /* Centra los elementos verticalmente */
+  text-align: center;
+
+  
+
+}
+
+.App-content {
+
+  margin-top: 80px;
+  /* Valor predeterminado para desktops y otros dispositivos */
+  width: 100%;
+  overflow-y: hidden;
+  height: 75vh;
+  
+  
+  
+}
+
+/* Media Queries para ajustar el marginTop en dispositivos móviles y medianos */
+@media (max-width: 599px) {
+
+  /* Asumiendo que 'xs' se extiende hasta 599px */
+  .App-content {
+    margin-top: 65px;
+    width: 100%;
+    /* Ajuste para dispositivos móviles */
+  }
+}
