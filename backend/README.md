@@ -28,17 +28,3 @@ DATABASES = {
 pip install psycopg2-binary # Para usar postgre SQL
 pip install django-cors-headers # para usar cors permitir peticiones desde el front
 pip install django-rest-knox
-
-# TO DO
-
-## Ahora
-
-1. Vistas de actividades
-
-## Cosas para después
-
-1. Localización
-2. Poder ver el ID del grupo de usuarios
-3. Al modelo Evento añadir duración y bloques. Mantener prioridad,
-   los eventos no tendrán hora de inicio-fin sino que irán asignados a un bloque
-   y tendrán un prioridad interna.
