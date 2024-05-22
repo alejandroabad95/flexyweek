@@ -81,21 +81,4 @@ npm install react-router-dom
 
 npm install axios
 
-## HACER
-
-Iteración Base
-
-1. Añadir Backend, llamada, servicio
-2. Añadir Frontend
-3. Unificación código, componentes
-
-Iteración Hoy
-
-1. Centrarse en Schedule Marcar como completado, Desmarcar de completado, pasar al día siguiente
-2. Ponerse ya con Planificador CREAR Eventos, Eliminar Eventos, Mover Eventos y Cambiar su prioridad
-
-Iteraciones futuras
-
-1. Mover o convertir tarea en hábito y viceversa
-2. Mejorar estética activities
-3. Theme.js
+npm install react-dnd @types/react-dnd

@@ -1,15 +1,12 @@
 import React, { useState, useEffect, useRef } from 'react';
-import {Container,Grid,Switch,FormControlLabel} from '@mui/material';
+import {Container,Grid} from '@mui/material';
 import { getActivities, createActivity, updateActivity, deleteActivity} from '../services/activity.service';
-import SingleColumnActivityList from '../components/SingleColumnActivityList/SingleColumnActivityList';
-import TwoColumnActivityList from '../components/TwoColumnActivityList/TwoColumnActivityList';
-
+import ActivityList from '../components/ActivityList/ActivityList';
 
 
 function ActivitiesPage() {
     // Estados
     const [activities, setActivities] = useState([]);
-    const [isTwoColumns, setIsTwoColumns] = useState(false);
     const [currentType, setCurrentType] = useState(1);
     const [isAddingActivity, setIsAddingActivity] = useState(false);
     const [newActivityName, setNewActivityName] = useState('');
@@ -76,11 +73,6 @@ function ActivitiesPage() {
     // Función para manejar el cambio de tipo de actividad en columna 1
     const handleTypeChange = (direction) => {
         setCurrentType((prevType) => (direction === 'previous' ? (prevType === 1 ? 2 : prevType - 1) : (prevType === 2 ? 1 : prevType + 1)));
-    };
-
-    // Función para manejar el cambio de columna
-    const handleToggle = (event) => {
-        setIsTwoColumns(event.target.checked);
     };
 
     // Función para manejar el cambio del nombre de la nueva actividad
@@ -191,34 +183,16 @@ function ActivitiesPage() {
 
     // Variables para diferenciar entre actividades tipo hábito y tipo tarea
     const filteredActivities = activities.filter(activity => activity.activity_type === currentType);
-    const habits = activities.filter(activity => activity.activity_type === 1);
-    const tasks = activities.filter(activity => activity.activity_type === 2);
 
     return (
         
         <Container maxWidth={false}>
 
-            {/* Controlador columnas */}
-            <FormControlLabel
-                sx={{ display: 'flex', justifyContent: 'flex-end'}}
-                control={
-                    <Switch
-                        checked={isTwoColumns}
-                        onChange={handleToggle}
-                        size='small'
-                        name="toggleColumns"
-                        color="secondary"
-                    />
-                }
-                label={'Columnas'}
-            />
-
             <Grid container sx={{ paddingTop: '0.5vh' }}>
-                {!isTwoColumns ? (
+               
                     <>
                         {/* División una columna */}
-                     
-                            <SingleColumnActivityList
+                            <ActivityList
                             filteredActivities={filteredActivities}
                             handleTypeChange={handleTypeChange}
                             currentType={currentType}
@@ -237,45 +211,9 @@ function ActivitiesPage() {
                             newActivityInputRef={newActivityInputRef}
                             editingActivityInputRef={editingActivityInputRef}
                             />
-                       
                     </>
-                ) : (
-                        <>
-                            {/* División dos columnas */}
-                            <TwoColumnActivityList
-                            habits={habits}
-                            tasks={tasks}
-                            currentType={currentType}
-                            setCurrentType={setCurrentType}
-                            isAddingActivity={isAddingActivity}
-                            newActivityName={newActivityName}
-                            handleNewActivityNameChange={handleNewActivityNameChange}
-                            handleAddActivity={handleAddActivity}
-                            error={error}
-                            editingActivityId={editingActivityId}
-                            updatedActivityName={updatedActivityName}
-                            handleUpdatedActivityNameChange={handleUpdatedActivityNameChange}
-                            handleSaveUpdatedActivity={handleSaveUpdatedActivity}
-                            handleEditActivity={handleEditActivity}
-                            handleDeleteActivity={handleDeleteActivity}
-                            handleStartAddActivity={handleStartAddActivity}
-                            newActivityInputRef={newActivityInputRef}
-                            editingActivityInputRef={editingActivityInputRef}
-                            />
-                        </>
-                        
-                )}
-
             </Grid>
-
-        
-        </Container>
-        
-       
-            
-        
-      
-    );
+                </Container>
+        );
 }
-
 export default ActivitiesPage;

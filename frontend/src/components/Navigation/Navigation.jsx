@@ -11,7 +11,7 @@ import Menu from '@mui/material/Menu';
 import AccountCircleIcon from '@mui/icons-material/AccountCircle';
 import { useAuth } from '../../contexts/auth.context';
 import { useAuthService } from '../../services/auth.service';
-import NavigationMenu from '../NavigationMenu/NavigationMenu';
+import NavigationMenu from './NavigationMenu';
 
 
 const pages = ['Actividades', 'Planificador', 'Horario'];
@@ -54,7 +54,7 @@ function Navigation() {
 
     return (
         <>
-            <AppBar position="fixed" color='secondary' sx={{height: { xs: '56px', sm: '64px' }}}
+            <AppBar position="fixed" color='primary' sx={{height: { xs: '56px', sm: '64px' }}}
              
             
             >

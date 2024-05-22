@@ -1,44 +1,32 @@
 import React, { useState, useEffect } from 'react';
-import { Paper, Typography, Grid, Container, ListItem, ListItemText, ListItemButton, List, FormControlLabel, Switch } from '@mui/material';
-import { getEventsToday, getEventsCompleted, getEventsNext } from '../services/event.service';
-import Slide from '@mui/material/Slide';
-
-
-import RadioButtonUncheckedTwoToneIcon from '@mui/icons-material/RadioButtonUncheckedTwoTone';
-import CheckCircleOutlineIcon from '@mui/icons-material/CheckCircleOutline';
-import HelpOutlineTwoToneIcon from '@mui/icons-material/HelpOutlineTwoTone';
-
-import KeyboardDoubleArrowRightRoundedIcon from '@mui/icons-material/KeyboardDoubleArrowRightRounded';
-import KeyboardDoubleArrowLeftRoundedIcon from '@mui/icons-material/KeyboardDoubleArrowLeftRounded';
-
+import { Container, Grid, FormControlLabel, Switch, Button } from '@mui/material';
+import { getEventsToday, getEventsCompleted, getEventsNext, updateEventCompleted, updateEventDay } from '../services/event.service';
+import EventListToday from '../components/EventList/EventListToday';
+import EventListFuture from '../components/EventList/EventListFuture';
 
 
 const SchedulePage = () => {
   const [eventsToday, setEventsToday] = useState([]);
-  const [eventsCompleted, setEventsCompleted] = useState([]);
   const [eventsNext, setEventsNext] = useState([]);
-  const [showCompleted, setShowCompleted] = useState(false);
-  
 
+  const [eventsCompleted, setEventsCompleted] = useState([]);
+  const [showNext, setShowNext] = useState(false);
+  
   useEffect(() => {
     fetchEventsToday();
-    fetchEventsNext();
-  }, []);
+    fetchEventsCompleted();
+    if (showNext) {
+      fetchEventsNext(); // Llama a fetchEventsNext solo si showNext es verdadero
+  }
+  }, [showNext]);
 
-  useEffect(() => {
-    if (showCompleted) {
-      fetchEventsCompleted();
-    } else {
-      fetchEventsToday();
-    }
-  }, [showCompleted]);
 
   const fetchEventsToday = async () => {
     try {
       const events = await getEventsToday();
       setEventsToday(events);
     } catch (error) {
-      console.error('Hubo un problema al obtener los eventos de hoy:', error.message);
+      console.error('Error fetching today events:', error.message);
     }
   };
 
@@ -47,7 +35,7 @@ const SchedulePage = () => {
       const events = await getEventsCompleted();
       setEventsCompleted(events);
     } catch (error) {
-      console.error('Hubo un problema al obtener los eventos completados:', error.message);
+      console.error('Error fetching completed events:', error.message);
     }
   };
 
@@ -56,166 +44,104 @@ const SchedulePage = () => {
       const events = await getEventsNext();
       setEventsNext(events);
     } catch (error) {
-      console.error('Hubo un problema al obtener los eventos próximos:', error.message);
+      console.error('Error fetching next events:', error.message);
+    }
+  };
+
+  const handleToggleCompleted = async (eventId) => {
+    try {
+      await updateEventCompleted(eventId);
+      fetchEventsCompleted();
+      fetchEventsToday();
+      console.log('marcado')
+    } catch (error) {
+      console.error('Error updating event completion status:', error.message);
+    }
+  };
+
+  const handleToggleEventDay = async (eventId, direction) => {
+    try {
+      await updateEventDay(eventId, direction);
+      fetchEventsToday();
+    } catch (error) {
+      console.error('Error updating event day:', error.message);
     }
   };
 
   return (
-    <Container sx={{}}>
-      <Grid container>
-        
-        <Grid item xs={12}>
+    <>
+    <Container sx={{height: '100%'}}>
+        <Grid container>
+          
+        <Grid item xs={12} sx={{ display: 'flex', justifyContent: 'flex-end' }}>
           <FormControlLabel
-            sx={{ display: 'flex', justifyContent: 'flex-end', paddingTop: '1vh' }}
             control={
               <Switch
-                checked={showCompleted}
-                onChange={() => setShowCompleted(!showCompleted)}
+                checked={showNext}
+                onChange={() => setShowNext(!showNext)}
                 color="secondary"
                 size='small'
               />
             }
-            label="Completadas"
+            label="Próximos eventos"
           />
         </Grid>
 
 
-        <Grid container sx={{paddingTop: '1vh'}}>
-
-            {/* Columna finalizadas */}
-          <Grid item xs={showCompleted ? 6 : 0}
-            sx={{display: showCompleted ? 'flex' : 'none' }}
-         
-          >
-              {/* Sale por la derecha y se esconde por la izquierda cuando está activo showCompleted */}
-              <Slide direction='right' in={showCompleted}> 
-              <Paper variant="outlined" sx={{ background: 'transparent', border: 'transparent' }}>
-                
-                  <Typography variant="h4">Finalizados</Typography>
-                  <List>
-                    {eventsCompleted.map(event => (
-                      <ListItem key={event.id}>
-                        
-                        <ListItemText primary={event.activity_name}
-                          
-                           secondary={
-                          <>
-                            <span>
-                            {event.goal}
-                              <HelpOutlineTwoToneIcon 
-                               
-                              />
-                            </span>
-                          </>
-                        } 
-                        
-                        />
-
-                        <ListItemButton>
-                        <CheckCircleOutlineIcon/>
-                        </ListItemButton>
-
-                      </ListItem>
-                    ))}
-                  </List>
-                </Paper>
-              </Slide>
+        <Grid item xs={!showNext ? 12 : 6} sx={{ marginTop: '2vh' }}>
+          <EventListToday
+            eventsToday={eventsToday}
+            eventsCompleted={eventsCompleted}
+            onToggleCompleted={handleToggleCompleted}
+            onToggleEventDay={handleToggleEventDay}
+            showNext={showNext}
+          />
           </Grid>
           
-
-
-
-        {/* Columna Hoy */}
-            <Grid item xs={6}>
-               
-              <Paper variant="outlined" sx={{ background: 'transparent', border: 'transparent' }}>
-                <Typography variant="h4">Hoy</Typography>
-                <List>
-                  {eventsToday.map(event => (
-                    <ListItem key={event.id}>
-                      <ListItemText primary={event.activity_name}
-                        secondary={
-                          <>
-                            <span>
-                            {event.goal}
-                              <HelpOutlineTwoToneIcon 
-                               
-                              />
-                            </span>
-                          </>
-                        } 
-                      />
-                    
-                      <ListItemButton>
-                        <RadioButtonUncheckedTwoToneIcon />
-                        <KeyboardDoubleArrowRightRoundedIcon />
-                      </ListItemButton>
-
-                    </ListItem>
-                  ))}
-                </List>
-                </Paper>
+          {/* Grid de eventos futuros */}
+          { showNext && (
+          
+            <Grid item xs={6} sx={{ marginTop: '2vh' }}>
+              
+               <EventListFuture
+                eventsNext={eventsNext}
+                onToggleCompleted={handleToggleCompleted}
+                onToggleEventDay={handleToggleEventDay}
+              />
+          
           </Grid>
           
-
-
-
-            
-            {/* Columna Próximas */}
-          <Grid item xs={6} sx={{display: showCompleted ? 'none' : 'flex' }}>
-              {/* Sale cuando no se muestran completadas por la izquierda y se esconde por la derecha */}
-              <Slide direction="left" in={!showCompleted}>
-              <Paper variant="outlined" sx={{ background: 'transparent', border: 'transparent' }}>
-                <Typography variant="h4">Próximos</Typography>
-                <List>
-                  {eventsNext.map(event => (
-                    <ListItem key={event.id}>
-                      <ListItemText primary={event.activity_name}
-                        
-                        secondary={
-                          <>
-                            <span>
-                            {event.goal}
-                              <HelpOutlineTwoToneIcon 
-                               
-                              />
-                            </span>
-                          </>
-                        } 
-                      
-                      
-                      
-                      
-                      />
-
-                      <ListItemButton>
-                        <RadioButtonUncheckedTwoToneIcon />
-                        <KeyboardDoubleArrowLeftRoundedIcon/>
-                     
-                      </ListItemButton>
-
-
-                       
-
-
-
-
-                    </ListItem>
-
-
-                    
-                    
-                  ))}
-                </List>
-                </Paper>
-              </Slide>
-
-          </Grid>
+          )
+          }
           
-        </Grid>
-         
       </Grid>
-    </Container>
+      </Container>
+      
+      {/* Botón "Resumen Semanal" */}
+      <Button 
+        variant="contained" 
+        color="secondary"
+        sx={{
+          position: 'fixed',
+          bottom: `calc(50px + 5vh)`,  // Ajusta la posición vertical según tus necesidades
+          left: '50%',  // Centra horizontalmente el botón
+          transform: 'translateX(-50%)',  // Desplaza el botón hacia la izquierda en un 50% de su propio ancho
+          zIndex: 1000,    // Asegura que el botón esté por encima de otros elementos
+        }}
+      >
+        Resumen Semanal
+      </Button>
+
+
+    
+
+    </>
+    
+    
+    
+    
+    
+    
   );
 };
 

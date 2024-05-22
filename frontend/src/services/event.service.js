@@ -24,6 +24,28 @@ const setToken = () => {
     axiosInstance.defaults.headers['Authorization'] = `Token ${token}`;
 };
 
+// Función para crear un nuevo evento
+const createEvent = async (newEvent) => {
+    setToken();
+    try {
+        const response = await axiosInstance.post('/events/create/', newEvent);
+        return response.data;
+    } catch (error) {
+        throw new Error('Hubo un problema al agregar el nuevo evento.');
+    }
+};
+
+// Función para obtener todos los eventos
+const getEvents = async () => {
+  setToken();
+  try {
+    const response = await axiosInstance.get('/events/');
+    return response.data; // Esto devuelve los eventos obtenidos del backend
+  } catch (error) {
+    console.error('Hubo un error al obtener los eventos:', error);
+    throw new Error('Hubo un error al obtener los eventos.');
+  }
+};
 
 // Función para obtener eventos de hoy
 const getEventsToday = async () => {
@@ -59,41 +81,67 @@ const getEventsNext = async () => {
     }
 };
 
-
-
-
-
-// Función para crear un nuevo evento
-const createEvent = async (newEvent) => {
+// Función para actualizar el estado de completado de un evento
+const updateEventCompleted = async (eventId) => {
     setToken();
     try {
-        const response = await axiosInstance.post('/events/create/', newEvent);
+        const response = await axiosInstance.put(`/events/${eventId}/toggle-completed/`);
         return response.data;
     } catch (error) {
-        throw new Error('Hubo un problema al agregar el nuevo evento.');
+        throw new Error('Hubo un problema al marcar como completado el evento');
     }
 };
 
-// Función para actualizar un evento existente
-const updateEvent = async (eventId, updatedEventData) => {
+// Función para adelantar o atrasar el día de un evento
+const updateEventDay = async (eventId, direction) => {
     setToken();
     try {
-        const response = await axiosInstance.put(`/events/${eventId}/update/`, updatedEventData);
+        const response = await axiosInstance.put(`/events/${eventId}/${direction}/toggle-day/`);
         return response.data;
     } catch (error) {
-        throw new Error('Hubo un problema al actualizar el evento.');
+        throw new Error(`Hubo un problema al cambiar el día del evento con ID ${eventId}`);
     }
 };
 
-// Función para eliminar un evento
+// Función para cambiar la posición de un evento
+const updateEventPosition = async (eventId, newDay, newPriority) => {
+  setToken();
+  try {
+    const response = await axiosInstance.put(`/events/${eventId}/update-position/`, {
+      new_day: newDay,
+      new_priority: newPriority,
+    });
+    return response.data;
+  } catch (error) {
+    throw new Error(`Hubo un problema al actualizar la posición del evento con ID ${eventId}`);
+  }
+};
+
+// Función para actualizar la actividad y objetivo de un evento
+const updateEventInfo = async (eventId, newActivity, newGoal) => {
+  setToken(); // Asegúrate de que el token de autenticación esté configurado correctamente
+  try {
+    const response = await axiosInstance.put(`/events/${eventId}/update/`, {
+      // Envía los nuevos datos de actividad y objetivo del evento
+      activity: newActivity,
+      goal: newGoal,
+    });
+    return response.data;
+  } catch (error) {
+    throw new Error(`Hubo un problema al actualizar la información del evento con ID ${eventId}`);
+  }
+};
+
 const deleteEvent = async (eventId) => {
-    setToken();
-    try {
-        await axiosInstance.delete(`/events/${eventId}/delete/`);
-        return true; // El evento se eliminó correctamente
-    } catch (error) {
-        throw new Error(`Hubo un problema al eliminar el evento con ID ${eventId}.`);
-    }
+  setToken(); // Asegúrate de tener una función setToken() definida para establecer el token de autenticación si es necesario
+  try {
+    const response = await axiosInstance.delete(`/events/${eventId}/delete/`);
+    return response.data;
+  } catch (error) {
+    throw new Error(`Hubo un problema al eliminar el evento con ID ${eventId}`);
+  }
 };
 
-export { getEventsToday,getEventsCompleted, getEventsNext, createEvent, updateEvent, deleteEvent };
+
+
+export { createEvent,getEvents,getEventsToday,getEventsCompleted, getEventsNext, updateEventCompleted, updateEventDay, updateEventPosition, updateEventInfo, deleteEvent };
