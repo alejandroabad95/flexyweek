@@ -1,10 +1,10 @@
 import React from 'react';
-import { Paper, Table, TableBody, TableCell, TableContainer, TableHead, TableRow } from '@mui/material';
+import { Paper, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Typography } from '@mui/material';
 import EventPaper from './EventPaper';
 import EventEmptyPaper from './EventEmptyPaper';
 
 const EventTable = ({ WeekHeaders, Week, priorityLevels, numColumnsWeek, filterEvents, handleDragStart, handleTouchStart, handleTouchMove, handleTouchEnd,
-handleClickMenuOpen, anchorElMap, selectedMenuEventMap, handleCloseMenu, handleOpenUpdateEventForm, handleOpenDeleteEventForm, handleDragOver, handleDrop, handleOpenCreateEventForm 
+  handleShowMenu, showMenu,handleOpenUpdateEventForm, handleOpenDeleteEventForm, handleDragOver, handleDrop, handleOpenCreateEventForm 
 }) => {
 
   return (
@@ -14,7 +14,14 @@ handleClickMenuOpen, anchorElMap, selectedMenuEventMap, handleCloseMenu, handleO
           <TableHead>
             <TableRow sx={{ height: '5vh' }}>
               {WeekHeaders.map((day) => (
-                <TableCell key={day}>{day}</TableCell>
+                <TableCell key={day} sx={{}}>
+                  
+                  <Typography variant="h3" color="initial" sx={{ fontWeight: 'bold' }}>
+                    {day}
+                  </Typography>
+
+
+                </TableCell>
               ))}
             </TableRow>
           </TableHead>
@@ -26,34 +33,54 @@ handleClickMenuOpen, anchorElMap, selectedMenuEventMap, handleCloseMenu, handleO
                     key={`${day}-${priority}`}
                     data-day={day}
                     data-priority={priority}
-                    sx={{ width: `${100 / numColumnsWeek}%`, height: '11vh', overflow: 'hidden' }}
+                    sx={{ width: `${100 / numColumnsWeek}%`, height: '11vh', overflow: 'hidden', border: 'none' }}
                   >
+               
                     {filterEvents(day, priority).length > 0 ? (
                       filterEvents(day, priority).map((event) => (
                         <EventPaper
                           key={event.id}
                           event={event}
-                          anchorElMap={anchorElMap}
-                          selectedMenuEventMap={selectedMenuEventMap}
-                          handleClickMenuOpen={handleClickMenuOpen}
-                          handleCloseMenu={handleCloseMenu}
+
+                          handleShowMenu={handleShowMenu}
+                          showMenu={showMenu}
+
                           handleOpenUpdateEventForm={handleOpenUpdateEventForm}
                           handleOpenDeleteEventForm={handleOpenDeleteEventForm}
+                          
                           handleDragStart={handleDragStart}
                           handleTouchStart={handleTouchStart}
                           handleTouchMove={handleTouchMove}
                           handleTouchEnd={handleTouchEnd}
+                          
+                          handleDragOver={handleDragOver}
+                          handleDrop={handleDrop}
+
+                         
+                         
+
                         />
                       ))
-                    ) : (
-                      <EventEmptyPaper
-                        day={day}
-                        priority={priority}
-                        handleDragOver={handleDragOver}
-                        handleDrop={handleDrop}
-                        handleOpenCreateEventForm={handleOpenCreateEventForm}
-                      />
-                    )}
+
+
+                    )
+                      
+                      :
+                      
+                      (
+                      // Mostrar EventEmptyPaper si existen eventos con un nivel de prioridad anterior o si la prioridad es 1
+                      (priority === 1 || filterEvents(day, priority - 1).length > 0) && (
+                        <EventEmptyPaper
+                          day={day}
+                          priority={priority}
+                          handleOpenCreateEventForm={handleOpenCreateEventForm}
+                        />
+                      )
+                    )
+                      
+                    
+                    
+                    }
                   </TableCell>
                 ))}
               </TableRow>

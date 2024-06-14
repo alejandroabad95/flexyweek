@@ -1,15 +1,18 @@
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
-from knox.models import AuthToken
+
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
-from django.contrib.auth import logout
+from django.contrib.auth import logout, update_session_auth_hash
 from django.contrib.auth.models import User
-from knox.auth import TokenAuthentication
+
 from rest_framework.permissions import IsAuthenticated
-from .serializers import UserSerializer
+from .serializers import UserSerializer, ChangePasswordSerializer
+
+from knox.models import AuthToken
+from knox.auth import TokenAuthentication
 
 # Create your views here.
 
@@ -23,6 +26,7 @@ class AuthInfoApiView(APIView):
         user = request.user
         serializer = UserSerializer(user)
         return Response(serializer.data, status=status.HTTP_200_OK)
+    
 
 class LoginApiView(APIView):
     def post(self, request):
@@ -49,8 +53,39 @@ class RegisterApiView(APIView):
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
+
+class ChangePasswordApiView(APIView):
+    authentication_classes = [TokenAuthentication]
+    permission_classes = [IsAuthenticated]
+
+    def post(self, request):
+        user = request.user
+        serializer = ChangePasswordSerializer(data=request.data)
+        if serializer.is_valid():
+            if not user.check_password(serializer.data.get("old_password")):
+                return Response({"old_password": "Wrong password."}, status=status.HTTP_400_BAD_REQUEST)
+            user.set_password(serializer.data.get("new_password"))
+            user.save()
+            update_session_auth_hash(request, user)  # Mantiene la sesión después del cambio de contraseña
+            return Response({"message": "Password changed successfully"}, status=status.HTTP_200_OK)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
+
+
 class LogoutApiView(APIView):
     def post(self, request):
         # Cerrar sesión del usuario
         logout(request)
         return Response({'message': 'Logout successful'}, status=status.HTTP_200_OK)
+
+
+class DeleteAccountApiView(APIView):
+    authentication_classes = [TokenAuthentication]
+    permission_classes = [IsAuthenticated]
+
+    def delete(self, request):
+        user = request.user
+        user.delete()
+        logout(request)
+        return Response({"message": "Account deleted successfully"}, status=status.HTTP_200_OK)

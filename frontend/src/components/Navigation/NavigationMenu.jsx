@@ -1,4 +1,5 @@
 import React, { useEffect } from 'react';
+import { useTheme } from '@emotion/react';
 import Drawer from '@mui/material/Drawer';
 import List from '@mui/material/List';
 import ListItem from '@mui/material/ListItem';
@@ -18,6 +19,8 @@ function NavigationMenu({ pages, routes, selectedPage, setSelectedPage, openNavM
         setOpenNavMenu(false); // Cerrar la barra lateral
     };
 
+    const theme = useTheme();
+
     return (
         <Drawer
             variant="temporary"
@@ -26,6 +29,7 @@ function NavigationMenu({ pages, routes, selectedPage, setSelectedPage, openNavM
             onClose={() => setOpenNavMenu(false)} // Manejar el cierre de la barra lateral
             sx={{
                 '&.MuiDrawer-root .MuiDrawer-paper': {
+                    backgroundColor: theme.palette.background.default,
                     marginTop: { xs: '56px', sm: '64px' },
                     height: { 
                         xs: `calc(100vh - 56px - 21px)`, // Altura ajustada para móviles
@@ -45,7 +49,11 @@ function NavigationMenu({ pages, routes, selectedPage, setSelectedPage, openNavM
                        
                         onClick={() => handleClick(index)} // Manejar el clic y cerrar la barra lateral
                     >
-                        <ListItemText primary={page} />
+                        <ListItemText
+                            primary={page}
+                           
+                        
+                        />
                     </ListItem>
                 ))}
             </List>

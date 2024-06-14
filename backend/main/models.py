@@ -17,10 +17,23 @@ class ActivityType (models.Model):
         verbose_name_plural = 'Tipos de actividad'
     
 class Activity(models.Model):
-    name = models.CharField(max_length=40, verbose_name="nombre")
+    name = models.CharField(max_length=30, verbose_name="nombre")
     activity_type = models.ForeignKey(ActivityType, on_delete=models.CASCADE, verbose_name="tipo" )
-    user = models.ForeignKey(User, on_delete=models.CASCADE, editable=False, verbose_name="usuario")  # editable=False para que no se muestre en el formulario
-    created_at = models.DateTimeField(default=timezone.now, verbose_name="fecha de creación")  # Fecha de creación
+    user = models.ForeignKey(User, on_delete=models.CASCADE, editable=False, verbose_name="usuario")  
+    created_at = models.DateTimeField(default=timezone.now, verbose_name="fecha de creación") 
+    # Límite total de actividades por usuario
+    TOTAL_ACTIVITY_LIMIT = 42
+
+    def save(self, *args, **kwargs):
+        # Contar todas las actividades del usuario actual
+        existing_activities_count = Activity.objects.filter(user=self.user).count()
+        
+        # Verificar si el número de actividades existentes supera el límite
+        if existing_activities_count >= self.TOTAL_ACTIVITY_LIMIT:
+            raise ValidationError(f"No puedes tener más de {self.TOTAL_ACTIVITY_LIMIT} actividades.")
+        
+        # Llamar al método save original si no se ha alcanzado el límite
+        super().save(*args, **kwargs)
 
     def __str__(self):
         return self.name
@@ -30,7 +43,6 @@ class Activity(models.Model):
         verbose_name_plural = 'Actividades'
       
         
-
 class Event(models.Model):
     DAY_CHOICES = [
         ('Mon', 'Lunes'),
@@ -43,29 +55,38 @@ class Event(models.Model):
     ]
 
     activity = models.ForeignKey(Activity, on_delete=models.CASCADE,verbose_name="actividad" )
-    goal = models.CharField(max_length=200, verbose_name="objetivo", blank=True)
+    goal = models.CharField(max_length=50, verbose_name="objetivo", blank=True)
     priority = models.IntegerField(default=1, verbose_name="prioridad")
     day = models.CharField(max_length=3, choices=DAY_CHOICES, verbose_name="día")
     completed = models.BooleanField(default=False, verbose_name="completado")  # Campo booleano para evento completado
+    completed_at = models.DateTimeField(null=True, blank=True)  # Fecha de completación
     user = models.ForeignKey(User, on_delete=models.CASCADE, editable=False)  # editable=False para que no se muestre en el formulario
 
-    def save(self, *args, **kwargs):
-        PRIORITY_MAX = 6
 
-        if not 1 <= self.priority <= PRIORITY_MAX:
-            raise ValidationError("La prioridad debe estar entre 1 y 6.")
+    def complete_event(self):
+        self.completed = True
+        self.completed_at = timezone.now()
+        self.save()
 
-        # Verificar si hay algún evento con la misma prioridad y día para el mismo usuario
-        existing_event = Event.objects.filter(
-            user=self.user,
-            day=self.day,
-            priority=self.priority
-        ).exclude(pk=self.pk)  # Excluir el propio objeto en caso de actualización
+    # def save(self, *args, **kwargs):
+    #     PRIORITY_MAX = 6
 
-        if existing_event.exists():
-            raise ValidationError("Ya existe un evento con esta prioridad en el mismo día.")
+    #     if not 1 <= self.priority <= PRIORITY_MAX:
+    #         raise ValidationError("La prioridad debe estar entre 1 y 6.")
 
-        super().save(*args, **kwargs)
+       
+    #     existing_event = Event.objects.filter(
+    #         user=self.user,
+    #         day=self.day,
+    #         priority=self.priority
+    #     ).exclude(pk=self.pk)  
+
+    #     if existing_event.exists():
+    #         raise ValidationError("Ya existe un evento con esta prioridad en el mismo día.")
+        
+        
+
+    #     super().save(*args, **kwargs)
 
     def __str__(self):
         return self.goal

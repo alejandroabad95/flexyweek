@@ -16,8 +16,8 @@ class ActivitySerializer(serializers.ModelSerializer):
 
 class EventSerializer(serializers.ModelSerializer):
 
-    activity_name = serializers.CharField(source='activity.name', read_only=True)
-    
+    activity = ActivitySerializer(read_only=True)
+
     class Meta:
         model = Event
         fields = '__all__'  

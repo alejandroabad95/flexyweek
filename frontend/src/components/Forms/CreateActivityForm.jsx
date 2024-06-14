@@ -1,6 +1,5 @@
 import React from 'react';
-import { Card, CardContent, TextField, IconButton } from '@mui/material';
-import { Check } from '@mui/icons-material';
+import { TextField, ListItem } from '@mui/material';
 
 const CreateActivityForm = ({
   newActivityName,
@@ -8,8 +7,8 @@ const CreateActivityForm = ({
   handleAddActivity,
   newActivityInputRef
 }) => (
-  <Card className="adding-activity-item">
-    <CardContent>
+
+    <ListItem className="adding-activity-item">
       <TextField
         label="Nombre de la actividad"
         value={newActivityName}
@@ -21,12 +20,10 @@ const CreateActivityForm = ({
             handleAddActivity();
           }
         }}
+        sx={{}}
       />
-      <IconButton color="primary" onClick={handleAddActivity}>
-        <Check />
-      </IconButton>
-    </CardContent>
-  </Card>
+  </ListItem>
+  
 );
 
 export default CreateActivityForm;

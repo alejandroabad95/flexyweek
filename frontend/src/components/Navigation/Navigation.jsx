@@ -9,8 +9,10 @@ import MenuIcon from '@mui/icons-material/Menu';
 import MenuItem from '@mui/material/MenuItem';
 import Menu from '@mui/material/Menu';
 import AccountCircleIcon from '@mui/icons-material/AccountCircle';
+import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../../contexts/auth.context';
 import { useAuthService } from '../../services/auth.service';
+import { useTheme } from '@emotion/react';
 import NavigationMenu from './NavigationMenu';
 
 
@@ -23,6 +25,7 @@ function Navigation() {
     const { user } = useAuth();
     const { logout } = useAuthService();
     const [selectedPage, setSelectedPage] = React.useState(1); // Índice de 'Planificador'
+    const navigate = useNavigate(); // Para redirigir a una ruta en concreto
    
 
     // Función para alternar la visibilidad del menú de navegación
@@ -41,6 +44,12 @@ function Navigation() {
         setAnchorEl(null); // Restablece el elemento ancla del menú de usuario a null, lo que lo cierra
     };
 
+     // Función para navegar a la página de perfil
+    const navigateToProfile = () => {
+        handleCloseUserMenu(); // Cierra el menú de usuario
+        navigate('/profile'); // Navega a la página de perfil
+    };
+
     // Función para manejar el cierre de sesión del usuario
     const handleLogout = async () => {
         try {
@@ -51,6 +60,8 @@ function Navigation() {
             // Maneja cualquier error que ocurra durante el cierre de sesión, como mostrar un mensaje de error al usuario
         }
     };
+
+    const theme = useTheme();
 
     return (
         <>
@@ -79,10 +90,10 @@ function Navigation() {
 
                             {/* Texto "Flexyweek" centrado */}
                             <Typography
-                                variant="h6"
+                                variant="h4"
                                 noWrap
                                 component="a"
-                                href="#app-bar-with-responsive-menu"
+                                href="/"
                                 sx={{
                                     fontFamily: 'monospace',
                                     fontWeight: 700,
@@ -106,14 +117,25 @@ function Navigation() {
                                     >
                                         <AccountCircleIcon />
                                     </IconButton>
+
                                     <Menu
                                         id="menu-user"
                                         anchorEl={anchorEl}
                                         open={Boolean(anchorEl)}
                                         onClose={handleCloseUserMenu}
+                                       
+                                    
+                                        sx={{
+
+                                            '& .MuiList-root': {
+                                                backgroundColor: theme.palette.background.default, // Cambia el color de fondo aquí
+                                            }
+
+
+                                        }}
+
                                     >
-                                        <MenuItem onClick={handleCloseUserMenu}>Mi Perfil</MenuItem>
-                                        <MenuItem onClick={handleCloseUserMenu}>Cambiar Contraseña</MenuItem>
+                                        <MenuItem onClick={navigateToProfile}>Mi Perfil</MenuItem>
                                         <MenuItem onClick={handleLogout}>Cerrar Sesión</MenuItem>
                                     </Menu>
                                 </>

@@ -21,6 +21,13 @@ function SignupPage() {
             <p>
                 ¿Ya tienes cuenta? <Link to="/login">Inicia sesión aquí</Link>
             </p>
+
+            <p>
+                Al registrarte, aceptas nuestra <Link to="/privacy-policy">política de privacidad</Link>.
+            </p>
+
+
+
         </div>
     );
 }

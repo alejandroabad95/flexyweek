@@ -1,11 +1,14 @@
 import React from 'react';
 import { Paper, Typography } from '@mui/material';
 
-const DraggedEventOverlay = ({ isDragging, draggedEvent, draggedEventPosition }) => {
-  if (!isDragging || !draggedEvent) {
-    return null; // No renderizar si no se está arrastrando un evento
+const DraggedEventOverlay = ({ isDragging, draggedEvent, draggedEventPosition}) => {
+  
+  if (!isDragging || !draggedEvent ) {
+    return null; 
   }
 
+  console.log(draggedEvent)
+  
   return (
     <Paper
       sx={{
@@ -22,7 +25,7 @@ const DraggedEventOverlay = ({ isDragging, draggedEvent, draggedEventPosition })
         alignItems: 'center',
       }}
     >
-      <Typography variant="body1">{draggedEvent.activity_name}</Typography>
+      <Typography variant="body1">{draggedEvent.activity.name}</Typography>
       <Typography variant="body2">{draggedEvent.goal}</Typography>
     </Paper>
   );

@@ -13,6 +13,9 @@ function ActivitiesPage() {
     const [error, setError] = useState(''); // Estado para manejar el mensaje de error
     const [editingActivityId, setEditingActivityId] = useState(null); // Estado para manejar el ID de la actividad que se está editando
     const [updatedActivityName, setUpdatedActivityName] = useState(''); // Estado para manejar el nuevo nombre de la actividad en edición
+    const [showMenu, setShowMenu] = useState(false); // Nuevo estado para mostrar el menú
+    
+    
     // Referencias para los campos de entrada creación o edición de actividad
     const newActivityInputRef = useRef(null);
     const editingActivityInputRef = useRef(null);
@@ -36,7 +39,7 @@ function ActivitiesPage() {
         }
     }, [isAddingActivity, editingActivityId]);
 
-    // Manejador global de clic para cancelar la adición o edición de actividades
+    // Manejador global de clic para cancelar adición, edición de eventos o dejar de mostrar opciones del engranaje
     useEffect(() => {
         const handleGlobalClick = (event) => {
 
@@ -124,9 +127,10 @@ function ActivitiesPage() {
         setUpdatedActivityName(activity.name);
          // Verifica si la actividad que se está editando es de tipo hábito o tarea y establece el tipo actual en consecuencia
         setCurrentType(activity.activity_type);
-
-
     };
+
+
+
 
     // Función para guardar la actividad actualizada
     const handleSaveUpdatedActivity = async (activityId) => {
@@ -166,7 +170,11 @@ function ActivitiesPage() {
         setError(''); // Limpia el mensaje de error cuando se cancela agregar actividad
     };
 
-
+    // Función para mostrar el menú al hacer clic en el icono de engranaje
+    const handleShowMenu = () => {
+        setShowMenu(!showMenu);
+    };
+    
     const handleDeleteActivity = async (activityId) => {
     try {
         // Llama a la función deleteActivity para eliminar la actividad
@@ -181,12 +189,16 @@ function ActivitiesPage() {
     }
     };
 
+
+
+
     // Variables para diferenciar entre actividades tipo hábito y tipo tarea
     const filteredActivities = activities.filter(activity => activity.activity_type === currentType);
 
     return (
         
-        <Container maxWidth={false}>
+        <Container maxWidth="md">
+
 
             <Grid container sx={{ paddingTop: '0.5vh' }}>
                
@@ -207,13 +219,20 @@ function ActivitiesPage() {
                             handleSaveUpdatedActivity={handleSaveUpdatedActivity}
                             handleEditActivity={handleEditActivity}
                             handleDeleteActivity={handleDeleteActivity}
+
+                            
+                            handleShowMenu={handleShowMenu}
+                            showMenu={showMenu}
+                        
                             handleStartAddActivity={handleStartAddActivity}
                             newActivityInputRef={newActivityInputRef}
                             editingActivityInputRef={editingActivityInputRef}
+                            
                             />
                     </>
             </Grid>
-                </Container>
+
+        </Container>
         );
 }
 export default ActivitiesPage;

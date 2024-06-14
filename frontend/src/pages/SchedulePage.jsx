@@ -1,41 +1,32 @@
 import React, { useState, useEffect } from 'react';
-import { Container, Grid, FormControlLabel, Switch, Button } from '@mui/material';
-import { getEventsToday, getEventsCompleted, getEventsNext, updateEventCompleted, updateEventDay } from '../services/event.service';
-import EventListToday from '../components/EventList/EventListToday';
-import EventListFuture from '../components/EventList/EventListFuture';
-
+import { Container, Grid, FormControlLabel, Switch, Button, Typography, useMediaQuery } from '@mui/material';
+import { getEventsToday, getEventsNext, updateEventCompleted, updateEventDay } from '../services/event.service';
+import EventList from '../components/EventList/EventList';
+import DrawerResume from '../components/DrawerResume/DrawerResume';
 
 const SchedulePage = () => {
   const [eventsToday, setEventsToday] = useState([]);
   const [eventsNext, setEventsNext] = useState([]);
-
-  const [eventsCompleted, setEventsCompleted] = useState([]);
   const [showNext, setShowNext] = useState(false);
-  
+
+
+  const [isDrawerOpen, setIsDrawerOpen] = useState(false);
+  const isSmallScreen = useMediaQuery('(max-height:700px)');
+
   useEffect(() => {
     fetchEventsToday();
-    fetchEventsCompleted();
     if (showNext) {
-      fetchEventsNext(); // Llama a fetchEventsNext solo si showNext es verdadero
-  }
+      fetchEventsNext();
+    }
   }, [showNext]);
 
-
+  
   const fetchEventsToday = async () => {
     try {
       const events = await getEventsToday();
       setEventsToday(events);
     } catch (error) {
       console.error('Error fetching today events:', error.message);
-    }
-  };
-
-  const fetchEventsCompleted = async () => {
-    try {
-      const events = await getEventsCompleted();
-      setEventsCompleted(events);
-    } catch (error) {
-      console.error('Error fetching completed events:', error.message);
     }
   };
 
@@ -51,9 +42,7 @@ const SchedulePage = () => {
   const handleToggleCompleted = async (eventId) => {
     try {
       await updateEventCompleted(eventId);
-      fetchEventsCompleted();
       fetchEventsToday();
-      console.log('marcado')
     } catch (error) {
       console.error('Error updating event completion status:', error.message);
     }
@@ -63,85 +52,97 @@ const SchedulePage = () => {
     try {
       await updateEventDay(eventId, direction);
       fetchEventsToday();
+      fetchEventsNext();
     } catch (error) {
       console.error('Error updating event day:', error.message);
     }
   };
 
+  const handleDrawerOpen = () => {
+    setIsDrawerOpen(true);
+  };
+
+  const handleDrawerClose = () => {
+    setIsDrawerOpen(false);
+  };
+
+
   return (
     <>
-    <Container sx={{height: '100%'}}>
-        <Grid container>
-          
-        <Grid item xs={12} sx={{ display: 'flex', justifyContent: 'flex-end' }}>
-          <FormControlLabel
-            control={
-              <Switch
-                checked={showNext}
-                onChange={() => setShowNext(!showNext)}
-                color="secondary"
-                size='small'
-              />
-            }
-            label="Próximos eventos"
-          />
-        </Grid>
-
-
-        <Grid item xs={!showNext ? 12 : 6} sx={{ marginTop: '2vh' }}>
-          <EventListToday
-            eventsToday={eventsToday}
-            eventsCompleted={eventsCompleted}
-            onToggleCompleted={handleToggleCompleted}
-            onToggleEventDay={handleToggleEventDay}
-            showNext={showNext}
-          />
+      <Container sx={{ height: '100%', paddingLeft:'8px', paddingRight: '8px' }}>
+        <Grid container sx={{}}>
+          <Grid item xs={12} sx={{ display: 'flex', justifyContent: 'space-around' }}>
+            {/* Botón "Resumen Semanal" */}
+            <Button
+              variant="contained"
+              color="info"
+              size="small"
+              onClick={handleDrawerOpen}
+              sx={{
+                // Ajusta este valor para que el botón no se superponga con el footer
+              }}
+            >
+              Resumen
+            </Button>
+            <FormControlLabel
+              control={
+                <Switch
+                  checked={showNext}
+                  onChange={() => setShowNext(!showNext)}
+                  color="info"
+                  size="small"
+                />
+              }
+              label="Próximos"
+            />
           </Grid>
-          
-          {/* Grid de eventos futuros */}
-          { showNext && (
-          
-            <Grid item xs={6} sx={{ marginTop: '2vh' }}>
-              
-               <EventListFuture
-                eventsNext={eventsNext}
+          {/* Lista Hoy en 1-2 columnas */}
+          <Grid item xs={!showNext ? 12 : 6}>
+            <Typography variant="h1" sx={{ margin: '2vh', textDecoration: 'underline', textDecorationSkipInk: 'none' }}>Hoy</Typography>
+            {eventsToday.length > 0 && (
+              <EventList
+                events={eventsToday}
                 onToggleCompleted={handleToggleCompleted}
                 onToggleEventDay={handleToggleEventDay}
+                isToday = {true}
+                showNext={showNext}
+                maxHeight= {isSmallScreen ? '58vh' : '61vh'}
+                
+               
+
               />
-          
+            )}
+
+            
+
+
           </Grid>
-          
-          )
-          }
-          
-      </Grid>
+
+          {showNext && (
+            <Grid item xs={6} sx={{}}>
+              <>
+                <Typography variant="h1" sx={{ margin: '2vh', textDecoration: 'underline', textDecorationSkipInk: 'none' }}>Próximos</Typography>
+                <EventList
+                  title="Próximos"
+                  events={eventsNext}
+                  onToggleCompleted={handleToggleCompleted}
+                  onToggleEventDay={handleToggleEventDay}
+                  isToday={false}
+                  showNext={showNext}
+                  maxHeight= {isSmallScreen ? '58vh' : '61vh'}
+                />
+              </>
+            </Grid>
+          )}
+        </Grid>
       </Container>
+
+      <DrawerResume isOpen={isDrawerOpen} onClose={handleDrawerClose} />
+
+
+
       
-      {/* Botón "Resumen Semanal" */}
-      <Button 
-        variant="contained" 
-        color="secondary"
-        sx={{
-          position: 'fixed',
-          bottom: `calc(50px + 5vh)`,  // Ajusta la posición vertical según tus necesidades
-          left: '50%',  // Centra horizontalmente el botón
-          transform: 'translateX(-50%)',  // Desplaza el botón hacia la izquierda en un 50% de su propio ancho
-          zIndex: 1000,    // Asegura que el botón esté por encima de otros elementos
-        }}
-      >
-        Resumen Semanal
-      </Button>
-
-
-    
-
     </>
-    
-    
-    
-    
-    
-    
   );
 };
 

@@ -28,12 +28,14 @@ const setToken = () => {
 const createEvent = async (newEvent) => {
     setToken();
     try {
+        console.log('Datos del nuevo evento:', newEvent); // Imprimir datos del nuevo evento
         const response = await axiosInstance.post('/events/create/', newEvent);
         return response.data;
     } catch (error) {
         throw new Error('Hubo un problema al agregar el nuevo evento.');
     }
 };
+
 
 // Función para obtener todos los eventos
 const getEvents = async () => {
@@ -58,19 +60,9 @@ const getEventsToday = async () => {
     }
 };
 
-// Función para obtener eventos completados
-const getEventsCompleted = async () => {
-    setToken(); // Asegurarse de que el token está configurado
-    try {
-        const response = await axiosInstance.get('/events/completed/');
-        return response.data;
-    } catch (error) {
-        throw new Error('Hubo un problema al obtener los eventos completados');
-    }
-};
 
 
-// Función para obtener eventos completados
+// Función para obtener eventos próximos
 const getEventsNext = async () => {
     setToken(); // Asegurarse de que el token está configurado
     try {
@@ -103,19 +95,21 @@ const updateEventDay = async (eventId, direction) => {
     }
 };
 
-// Función para cambiar la posición de un evento
-const updateEventPosition = async (eventId, newDay, newPriority) => {
+
+const updateEventPosition = async (event1Id, event2Id) => {
   setToken();
   try {
-    const response = await axiosInstance.put(`/events/${eventId}/update-position/`, {
-      new_day: newDay,
-      new_priority: newPriority,
+    const response = await axiosInstance.put('/events/update-position/', {
+      event1Id: event1Id,
+      event2Id: event2Id,
     });
     return response.data;
   } catch (error) {
-    throw new Error(`Hubo un problema al actualizar la posición del evento con ID ${eventId}`);
+    throw new Error(`Hubo un problema al intercambiar los eventos`);
   }
 };
+
+
 
 // Función para actualizar la actividad y objetivo de un evento
 const updateEventInfo = async (eventId, newActivity, newGoal) => {
@@ -144,4 +138,4 @@ const deleteEvent = async (eventId) => {
 
 
 
-export { createEvent,getEvents,getEventsToday,getEventsCompleted, getEventsNext, updateEventCompleted, updateEventDay, updateEventPosition, updateEventInfo, deleteEvent };
+export { createEvent,getEvents,getEventsToday , getEventsNext, updateEventCompleted, updateEventDay, updateEventPosition, updateEventInfo, deleteEvent };

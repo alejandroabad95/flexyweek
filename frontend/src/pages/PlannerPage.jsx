@@ -10,6 +10,7 @@ import UpdateEventForm from '../components/Forms/UpdateEventForm';
 import DeleteEventForm from '../components/Forms/DeleteEventForm';
 
 const PlannerPage = () => {
+
   const [events, setEvents] = useState([]);
   const [openCreateEventForm, setOpenCreateEventForm] = useState(false);
   
@@ -20,15 +21,17 @@ const PlannerPage = () => {
   const [selectedDay, setSelectedDay] = useState('');
   const [selectedPriority, setSelectedPriority] = useState(1);
   const [draggedEvent, setDraggedEvent] = useState(null);
+
   const [isDragging, setIsDragging] = useState(false);
+
+  const [canDrag, setCanDrag] = useState(false);
+  
   const [draggedEventPosition, setDraggedEventPosition] = useState({ x: 0, y: 0 });
   const touchTargetRef = useRef(null);
 
-  // Estado para almacenar el ancla del menú desplegable para cada evento
-  const [anchorElMap, setAnchorElMap] = useState({});
+  const [showMenu, setShowMenu] = useState(false); // Nuevo estado para mostrar el menú
 
-  // Estado para almacenar el evento seleccionado en el menú para cada evento
-  const [selectedMenuEventMap, setSelectedMenuEventMap] = useState({});
+
  
   useEffect(() => {
     fetchEvents();
@@ -38,7 +41,7 @@ const PlannerPage = () => {
     try {
       const events = await getEvents();
       setEvents(events);
-      console.log(events);
+      
     } catch (error) {
       console.error('Hubo un problema al obtener los eventos:', error.message);
     }
@@ -58,7 +61,7 @@ const PlannerPage = () => {
   };
 
   const handleCreateEvent = async (eventData) => {
-    console.log('Evento a crear:', eventData);
+   
     setOpenCreateEventForm(false);
     try {
       const response = await createEvent(eventData);
@@ -75,23 +78,23 @@ const PlannerPage = () => {
   // ACTUALIZACIÓN Y ELIMINACIÓN DE EVENTOS
 
 
-  // Función para abrir el menú desplegable para un evento específico
-  const handleClickMenuOpen = (event, eventData) => {
-    
-    setSelectedMenuEventMap({ ...selectedMenuEventMap, [eventData.id]: eventData });
-    setAnchorElMap({ ...anchorElMap, [eventData.id]: event.currentTarget });
-    
+
+
+  // Función para mostrar el menú al hacer clic en el icono de engranaje
+  const handleShowMenu = () => {
+    setCanDrag(false);
+    setShowMenu(!showMenu);
+    setIsDragging(false);
+      
   };
 
-  // Función para cerrar el menú desplegable para un evento específico
-  const handleCloseMenu = (eventData) => {
-    setSelectedMenuEventMap({ ...selectedMenuEventMap, [eventData.id]: null });
-    setAnchorElMap({ ...anchorElMap, [eventData.id]: null });
-  };
+
+
 
   // Función para abrir el modal de actualización del evento
 
   const handleOpenUpdateEventForm = (eventData) => {
+    setCanDrag(false);
     setSelectedEvent(eventData);
     setOpenUpdateEventForm(true);
   };
@@ -127,27 +130,33 @@ const PlannerPage = () => {
   if (event.target.tagName.toLowerCase() !== 'typography') {
     event.dataTransfer.setData('eventData', JSON.stringify(eventData));
     setDraggedEvent(eventData);
-    setIsDragging(true);
+    // setIsDragging(true);
   }
     
   };
 
   const handleTouchStart = (event, eventData) => {
-  if (event.target.innerText === eventData.goal) {
-    return; // No activar el arrastre si se hace clic en el "goal"
-  }
 
-  const touch = event.touches[0];
-  setDraggedEvent(eventData);
-  setDraggedEventPosition({ x: touch.clientX, y: touch.clientY });
-  touchTargetRef.current = event.target;
-  setIsDragging(true);
-};
+    setCanDrag(true);
+
+    if (canDrag) {
+    
+      const touch = event.touches[0];
+    
+      setDraggedEvent(eventData);
+      setDraggedEventPosition({ x: touch.clientX, y: touch.clientY });
+      touchTargetRef.current = event.target;
+
+      setIsDragging(true);
+    }
+
+
+  };
 
 
   const handleTouchMove = (event) => {
     if (isDragging) {
-      event.preventDefault();
+      // event.preventDefault();
       const touch = event.touches[0];
       setDraggedEventPosition({ x: touch.clientX, y: touch.clientY });
       const element = document.elementFromPoint(touch.clientX, touch.clientY);
@@ -157,54 +166,92 @@ const PlannerPage = () => {
     }
   };
 
-  const handleTouchEnd = async (event) => {
-    if (!draggedEvent) return;
+///////////////////////////////////////////////////////////////////////////////
+  
+  const handleTouchEnd = async () => {
+    if (draggedEvent) {
+      const element = document.elementFromPoint(draggedEventPosition.x, draggedEventPosition.y);
+      if (element && element.closest('td')) {
+        const day = element.closest('td').getAttribute('data-day');
+        const priority = element.closest('td').getAttribute('data-priority');
+        if (day && priority) {
+          console.log(draggedEvent.id, 'Evento soltado en el día:', day, 'con prioridad:', priority);
+          
+          const filterEvent = events.filter((event) => (event.day === day && event.priority === Number(priority)))
+          const targetEvent = filterEvent[0]
+        
 
-    const touch = event.changedTouches[0];
-    const element = document.elementFromPoint(touch.clientX, touch.clientY);
-    if (element && element.closest('td')) {
-      const day = element.closest('td').getAttribute('data-day');
-      const priority = element.closest('td').getAttribute('data-priority');
-      if (day && priority) {
-        console.log('Touch end:', draggedEvent.id, 'in day:', day, 'priority:', priority);
-        try {
-          await updateEventPosition(draggedEvent.id, day, parseInt(priority, 10));
-          console.log('Posición del evento actualizada con éxito.');
-          fetchEvents();
+          try {
+            await updateEventPosition(draggedEvent.id, targetEvent.id);
+            console.log('Posiciones de los eventos actualizadas con éxito.');
+            fetchEvents();  // Recargar eventos para reflejar los cambios
         } catch (error) {
-          console.error('Hubo un problema al actualizar la posición del evento:', error.message);
+            console.error('Hubo un problema al actualizar las posiciones de los eventos:', error.message);
         }
-        setDraggedEvent(null);
-      }
-    }
-    setIsDragging(false);
-  };
+        
+        }
 
-  const handleDrop = async (event, day, priority) => {
-    event.preventDefault();
-    let eventData;
-    if (event.dataTransfer) {
-      eventData = JSON.parse(event.dataTransfer.getData('eventData'));
-    } else {
-      eventData = draggedEvent;
-    }
-    if (eventData) {
-      console.log('Drop:', eventData, 'in day:', day, 'priority:', priority);
-      try {
-        await updateEventPosition(eventData.id, day, priority);
-        console.log('Posición del evento actualizada con éxito.');
-        fetchEvents();
-      } catch (error) {
-        console.error('Hubo un problema al actualizar la posición del evento:', error.message);
+
       }
       setDraggedEvent(null);
     }
     setIsDragging(false);
   };
 
+
+
+  const handleDrop = async (e, targetEvent) => {
+    e.preventDefault();
+   
+    let draggedEventData;
+    if (e.dataTransfer) {
+        draggedEventData = JSON.parse(e.dataTransfer.getData('eventData'));
+    } else {
+        draggedEventData = draggedEvent;
+    }
+
+    if (draggedEventData && targetEvent) {
+        try {
+            await updateEventPosition(draggedEventData.id, targetEvent.id);
+            console.log('Posiciones de los eventos actualizadas con éxito.');
+            fetchEvents();  // Recargar eventos para reflejar los cambios
+        } catch (error) {
+            console.error('Hubo un problema al actualizar las posiciones de los eventos:', error.message);
+        }
+    } else {
+        console.error('Datos insuficientes para actualizar las posiciones de los eventos.');
+    }
+    setDraggedEvent(null);
+    setIsDragging(false);
+};
+
+
+  // const handleDrop = async (event, day, priority) => {
+  //   event.preventDefault();
+  //   let eventData;
+  //   if (event.dataTransfer) {
+  //     eventData = JSON.parse(event.dataTransfer.getData('eventData'));
+  //   } else {
+  //     eventData = draggedEvent;
+  //   }
+  //   if (eventData) {
+  //     console.log('Drop:', eventData, 'in day:', day, 'priority:', priority);
+  //     try {
+  //       await updateEventPosition(eventData.id, day, priority);
+  //       console.log('Posición del evento actualizada con éxito.');
+  //       fetchEvents();
+  //     } catch (error) {
+  //       console.error('Hubo un problema al actualizar la posición del evento:', error.message);
+  //     }
+  //     setDraggedEvent(null);
+  //   }
+  //   setIsDragging(false);
+  // };
+
+
+
   const handleDragOver = (event) => {
     event.preventDefault();
-    console.log('El evento arrastrado está sobre el área de destino.');
   };
 
   const filterEvents = (day, priority) => {
@@ -214,6 +261,7 @@ const PlannerPage = () => {
   // Eventos eliminación 
 
   const handleOpenDeleteEventForm = (eventData) => {
+    setCanDrag(false);
     setSelectedEvent(eventData);
     setOpenDeleteEventForm(true);
   };
@@ -255,16 +303,15 @@ const PlannerPage = () => {
       handleTouchStart={handleTouchStart}
       handleTouchMove={handleTouchMove}
       handleTouchEnd={handleTouchEnd}
-      handleClickMenuOpen={handleClickMenuOpen}
-      anchorElMap={anchorElMap}
-      selectedMenuEventMap={selectedMenuEventMap}
-      handleCloseMenu={handleCloseMenu}
+      handleShowMenu={handleShowMenu}
+        showMenu={showMenu}
+       
       handleOpenUpdateEventForm={handleOpenUpdateEventForm}
       handleOpenDeleteEventForm={handleOpenDeleteEventForm}
       handleDragOver={handleDragOver}
       handleDrop={handleDrop}
       handleOpenCreateEventForm={handleOpenCreateEventForm}
-      isDragging={isDragging}
+      
       />
       
       <div style={{ marginTop: '5vh' }}></div>
@@ -279,10 +326,10 @@ const PlannerPage = () => {
       handleTouchStart={handleTouchStart}
       handleTouchMove={handleTouchMove}
       handleTouchEnd={handleTouchEnd}
-      handleClickMenuOpen={handleClickMenuOpen}
-      anchorElMap={anchorElMap}
-      selectedMenuEventMap={selectedMenuEventMap}
-      handleCloseMenu={handleCloseMenu}
+      
+      handleShowMenu={handleShowMenu}
+      showMenu={showMenu}
+
       handleOpenUpdateEventForm={handleOpenUpdateEventForm}
       handleOpenDeleteEventForm={handleOpenDeleteEventForm}
       handleDragOver={handleDragOver}
@@ -316,6 +363,8 @@ const PlannerPage = () => {
         isDragging={isDragging}
         draggedEvent={draggedEvent}
         draggedEventPosition={draggedEventPosition}
+       
+
       />
 
     </>

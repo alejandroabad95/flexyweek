@@ -41,6 +41,55 @@ export function useAuthService() {
         }
     }
 
+    async function getProfile() {
+        try {
+            const token = localStorage.getItem('Token');
+            const response = await axios.get(`${process.env.REACT_APP_API_URL}/auth/user/`, {
+                headers: {
+                    'Authorization': `Token ${token}`
+                }
+            });
+            return response.data;
+        } catch (error) {
+            console.error('Error al obtener el perfil:', error);
+            throw new Error('Error al obtener la información del perfil.');
+        }
+    }
+
+    async function changePassword(oldPassword, newPassword) {
+        try {
+            const token = localStorage.getItem('Token');
+            await axios.post(`${process.env.REACT_APP_API_URL}/auth/change-password/`, {
+                old_password: oldPassword,
+                new_password: newPassword
+            }, {
+                headers: {
+                    'Authorization': `Token ${token}`
+                }
+            });
+        } catch (error) {
+            console.error('Error al cambiar la contraseña:', error);
+            throw new Error('Error al cambiar la contraseña.');
+        }
+    }
+
+    async function deleteAccount() {
+        try {
+            const token = localStorage.getItem('Token');
+            await axios.delete(`${process.env.REACT_APP_API_URL}/auth/delete-account/`, {
+                headers: {
+                    'Authorization': `Token ${token}`
+                }
+            });
+            localStorage.removeItem('Token');
+            updateUserState(null);
+            navigate('/signup');
+        } catch (error) {
+            console.error('Error al eliminar la cuenta:', error);
+            throw new Error('Error al eliminar la cuenta.');
+        }
+    }
+
     async function logout() {
         try {
             // Realiza una solicitud POST para cerrar sesión
@@ -60,5 +109,7 @@ export function useAuthService() {
         }
     }
 
-    return { login, signup, logout };
+
+
+    return { signup, login, getProfile, logout, changePassword, deleteAccount};
 }

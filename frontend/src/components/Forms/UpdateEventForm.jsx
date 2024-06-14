@@ -8,7 +8,8 @@ import {
   Button,
   Select,
   MenuItem,
-  CircularProgress
+  CircularProgress,
+  ButtonGroup
 } from '@mui/material';
 import { getActivities } from '../../services/activity.service'; 
 
@@ -17,14 +18,29 @@ const UpdateEventForm = ({ open, handleClose, eventData, handleUpdateEvent }) =>
   const [goal, setGoal] = useState('');
   const [activities, setActivities] = useState([]);
   const [loading, setLoading] = useState(false);
+  const [filteredActivities, setFilteredActivities] = useState([]);
+  const [showHabits, setShowHabits] = useState(true); // Por defecto, mostrar hábitos
+  const [showTasks, setShowTasks] = useState(true); // Por defecto, mostrar tareas
 
   useEffect(() => {
-    if (open) {
+    if (open && eventData) {
       setLoading(true);
-      // Carga de actividades solo cuando el diálogo se abre
       getActivities()
         .then(data => {
-          setActivities(data);
+          // Aplicar filtros
+          let filtered = data;
+          if (!showHabits) {
+            filtered = filtered.filter(act => act.activity_type !== 1);
+          }
+          if (!showTasks) {
+            filtered = filtered.filter(act => act.activity_type !== 2);
+          }
+          setActivities(filtered);
+
+          // Seleccionar la actividad actual del evento
+          setActivity(eventData.activity.id);
+          setGoal(eventData.goal);
+          
           setLoading(false);
         })
         .catch(error => {
@@ -32,20 +48,28 @@ const UpdateEventForm = ({ open, handleClose, eventData, handleUpdateEvent }) =>
           setLoading(false);
         });
     }
-  }, [open]);  
+  }, [open, eventData, showHabits, showTasks]);  
 
-  useEffect(() => {
-    // Cuando cambia el evento seleccionado, actualiza los campos del formulario
-    if (eventData) {
-      setActivity(eventData.activity);
-      setGoal(eventData.goal);
+  const filterActivities = () => {
+    let filtered = activities;
+    if (!showHabits) {
+      filtered = filtered.filter(act => act.activity_type !== 1);
     }
-  }, [eventData]);  
+    if (!showTasks) {
+      filtered = filtered.filter(act => act.activity_type !== 2);
+    }
+    setFilteredActivities(filtered);
+  };
 
   const submitForm = () => {
-    handleUpdateEvent({ activity, goal });
+    console.log('Datos a enviar:', { activity, goal }); 
+    handleUpdateEvent({ activity, goal }); // Envía activity y goal al método de actualización
     handleClose();
   };
+
+  useEffect(() => {
+    filterActivities();
+  }, [showHabits, showTasks, activities]);
 
   return (
     <Dialog open={open} onClose={handleClose}>
@@ -55,14 +79,31 @@ const UpdateEventForm = ({ open, handleClose, eventData, handleUpdateEvent }) =>
           <CircularProgress />
         ) : (
           <>
+            <ButtonGroup fullWidth variant="outlined" aria-label="Filtrar actividades">
+              <Button
+                onClick={() => setShowHabits(prevState => !prevState)}
+                variant={showHabits ? 'contained' : 'outlined'}
+                color="primary"
+              >
+                Hábitos
+              </Button>
+              <Button
+                onClick={() => setShowTasks(prevState => !prevState)}
+                variant={showTasks ? 'contained' : 'outlined'}
+                color="primary"
+              >
+                Tareas
+              </Button>
+            </ButtonGroup>
             <Select
               value={activity}
               onChange={e => setActivity(e.target.value)}
               fullWidth
               displayEmpty
+              style={{ marginTop: '1rem' }}
             >
               <MenuItem value="" disabled>Selecciona una actividad</MenuItem>
-              {activities.map(act => (
+              {filteredActivities.map(act => (
                 <MenuItem key={act.id} value={act.id}>{act.name}</MenuItem>
               ))}
             </Select>
@@ -74,6 +115,7 @@ const UpdateEventForm = ({ open, handleClose, eventData, handleUpdateEvent }) =>
               value={goal}
               onChange={e => setGoal(e.target.value)}
               placeholder="Opcional"
+              style={{ marginTop: '1rem' }}
             />
           </>
         )}
