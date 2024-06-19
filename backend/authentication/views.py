@@ -52,6 +52,10 @@ class RegisterApiView(APIView):
             return Response({'token': token}, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
+class CountUsersApiView(APIView):
+    def get(self, request):
+        user_count = User.objects.count()
+        return Response({'count': user_count}, status=status.HTTP_200_OK)
 
 
 class ChangePasswordApiView(APIView):

@@ -28,7 +28,17 @@ export function useAuthService() {
 
     async function signup(username, password, email) {
         try {
-            await axios.post(`${process.env.REACT_APP_API_URL}/auth/signup/`, {
+            // Verifica el número de usuarios registrados antes de intentar registrar uno nuevo
+            const response = await axios.get(`${process.env.REACT_APP_API_URL}/auth/count-users/`);
+            const userCount = response.data.count;
+
+            if (userCount >= 50) {
+                alert('Se ha alcanzado el límite máximo de usuarios registrados.');
+                return;
+            }
+
+            // Si no se ha alcanzado el límite, procede con el registro
+            await axios.post(`${process.env.REACT_APP_API_URL}/signup/`, {
                 username,
                 password,
                 email,
@@ -40,6 +50,11 @@ export function useAuthService() {
             throw new Error('Error al registrarse. Por favor, verifica tus datos.');
         }
     }
+
+
+
+
+
 
     async function getProfile() {
         try {

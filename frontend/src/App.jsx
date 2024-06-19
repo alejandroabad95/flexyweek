@@ -3,7 +3,7 @@ import Navigation from './components/Navigation/Navigation';
 import Footer from './components/Footer/Footer';
 import AppRoutes from './routes/AppRoutes';
 import Box from '@mui/material/Box';
-import AdBanner from './components/AdBanner/AdBanner';
+// import AdBanner from './components/AdBanner/AdBanner';
 
 function App() {
 
@@ -15,7 +15,8 @@ function App() {
                     }, }}>
                 <AppRoutes />
             </Box>
-            <AdBanner />
+            {/* <AdBanner /> */}
+
             <Footer />
         </Box>
     );
