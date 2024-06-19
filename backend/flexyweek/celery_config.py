@@ -21,6 +21,6 @@ app.autodiscover_tasks()
 app.conf.beat_schedule = {
     'desmarcar-eventos-cada-domingo': {
         'task': 'main.tasks.unmark_completed_events',
-        'schedule': crontab(hour=0, minute=0, day_of_week=0),  # Ejecutar todos los domingos a la medianoche (0:00 AM)
+        'schedule': crontab(hour=6, minute=0, day_of_week=1),  # Ejecutar todos los domingos a la medianoche (0:00 AM)
     },
 }
