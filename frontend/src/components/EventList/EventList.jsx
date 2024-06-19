@@ -3,7 +3,7 @@ import { Paper, useTheme, List, Typography } from '@mui/material';
 import EventListItem from './EventListItem';
 
 
-const EventList = ({ events, onToggleCompleted, onToggleEventDay, maxHeight, isToday,  showNext }) => {
+const EventList = ({ events, onToggleCompleted, onToggleEventDay, maxHeight, isResume, isToday,  showNext }) => {
 
   const theme = useTheme();
 
@@ -37,7 +37,7 @@ const EventList = ({ events, onToggleCompleted, onToggleEventDay, maxHeight, isT
 
 
 
-  console.log(events)
+
   return (
     <Paper elevation={0}
       
@@ -53,7 +53,13 @@ const EventList = ({ events, onToggleCompleted, onToggleEventDay, maxHeight, isT
       
       <List sx={{ maxHeight: maxHeight, overflowY: 'auto' }}>
         
-        {Object.keys(groupedEvents).map(day => (
+        {Object.keys(groupedEvents).sort((a, b) => {
+          // Ordenar por el orden deseado de los días de la semana
+          const daysOfWeek = ['Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado', 'Domingo'];
+          return daysOfWeek.indexOf(a) - daysOfWeek.indexOf(b);
+        }).map
+          
+          (day => (
           <>
             <Typography variant="h3" sx={{display:'flex', justifyContent:'center', fontStyle:'italic'}}>{day}</Typography>
 
@@ -65,25 +71,12 @@ const EventList = ({ events, onToggleCompleted, onToggleEventDay, maxHeight, isT
                 onToggleEventDay={onToggleEventDay}
                 showNext={showNext}
                 isToday={isToday}
+                isResume={isResume}
               />
             ))}
           </>
         ))}
 
-
-        {/* {events.map(event => (
-          <>
-          <EventListItem
-            key={event.id}
-            event={event}
-            onToggleCompleted={onToggleCompleted}
-            onToggleEventDay={onToggleEventDay}
-            showNext={showNext}
-            isToday={isToday}
-            />
-          </>
-         
-        ))} */}
 
 
 

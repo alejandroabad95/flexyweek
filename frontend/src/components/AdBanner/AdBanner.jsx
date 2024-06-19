@@ -1,20 +1,45 @@
-import React from 'react';
-import { Box, Typography } from '@mui/material';
+import React, { useEffect } from 'react';
+import { Box } from '@mui/material';
+
 
 const AdBanner = () => {
+    useEffect(() => {
+        // Simulación de carga de script de Revcontent
+        const script = document.createElement('script');
+        script.textContent = `
+            // Script simulado de Revcontent para prueba
+            const ads = [
+                { title: 'Anuncio 1', url: 'https://ejemplo.com/anuncio1' },
+                { title: 'Anuncio 2', url: 'https://ejemplo.com/anuncio2' },
+                { title: 'Anuncio 3', url: 'https://ejemplo.com/anuncio3' },
+            ];
+            ads.forEach(ad => {
+                const adDiv = document.createElement('div');
+                adDiv.textContent = ad.title;
+                document.getElementById('revcontent-widget').appendChild(adDiv);
+            });
+        `;
+        document.body.appendChild(script);
+
+        return () => {
+            document.body.removeChild(script);
+        };
+    }, []);
+
     return (
         <Box sx={{
             position: 'fixed',
-            bottom: 20,  // Asegúrate de que esté justo encima del borde inferior
-            left: 0,     // Comienza desde el borde izquierdo de la pantalla
-            width: '100%', // Ocupa todo el ancho de la pantalla
-            height: '5vh', // Altura fija
-            display: 'flex', // Usa flexbox para centrar el contenido
-            alignItems: 'center', // Centra verticalmente el contenido dentro del Box
-            justifyContent: 'center', // Centra horizontalmente el contenido dentro del Box
-            background: 'black', // Color de fondo
+            bottom: 20,
+            left: 0,
+            width: '100%',
+            height: '5vh',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            background: 'lightyellow',
+            zIndex: 1000,
         }}>
-            <Typography variant="h6" sx={{ color: 'white' }}>Anuncio</Typography>
+            <div id="revcontent-widget"></div>
         </Box>
     );
 };

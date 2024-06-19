@@ -62,8 +62,6 @@ class EventCreate(generics.CreateAPIView):
         activity_id = self.request.data.get('activity')  # Asegúrate de obtener el ID de la actividad
         serializer.save(user=self.request.user, activity_id=activity_id)
 
-
-
 # Muestra todos los eventos de un usuario
 class EventList(generics.ListAPIView):
     serializer_class = EventSerializer
@@ -74,9 +72,41 @@ class EventList(generics.ListAPIView):
         # Filtrar las actividades por el usuario autenticado
         
         return Event.objects.filter(user=self.request.user)
+    
+
+# Muestra todos los eventos pasados
+
+class EventPastList(generics.ListAPIView):
+    serializer_class = EventSerializer
+    permission_classes = [permissions.IsAuthenticated]
+    authentication_classes = [TokenAuthentication]
+
+    def get_queryset(self):
+        # Obtén el día actual en el formato de tu modelo Event
+        today = timezone.now().strftime('%a')
+
+        # Lista de días de la semana en orden
+        days_of_week = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun']
+
+        # Encuentra el índice del día actual en la lista
+        current_day_index = days_of_week.index(today)
+
+        # Si el día actual no es domingo, mostrar eventos desde el lunes hasta el día anterior al día actual
+        if current_day_index > 0:
+            past_days = days_of_week[:current_day_index]
+        else:
+            past_days = []  # No mostrar eventos si el día actual es domingo
+
+        # Filtra los eventos cuyo día esté en la lista de días pasados
+        queryset = Event.objects.filter(user=self.request.user, day__in=past_days)
+
+        # Ordenar primero por día y luego por prioridad dentro de cada día
+        queryset = sorted(queryset, key=lambda x: (past_days.index(x.day), x.priority))
+
+        return queryset
 
 
-
+# Muestra todos los eventos actuales
 class EventTodayList(generics.ListAPIView):
     serializer_class = EventSerializer
     permission_classes = [permissions.IsAuthenticated]

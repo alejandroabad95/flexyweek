@@ -6,13 +6,14 @@ import DrawerResume from '../components/DrawerResume/DrawerResume';
 
 const SchedulePage = () => {
   
-  // Estados para almacenar eventos
+  // variables para almacenar eventos
   const [events, setEvents] = useState([]);
+
   const [eventsToday, setEventsToday] = useState([]);
   const [eventsNext, setEventsNext] = useState([]);
-  const [eventsPast, setEventsPast] = useState([]); // Añadido para eventos pasados
-
   const [showNext, setShowNext] = useState(false);
+
+
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
   const isSmallScreen = useMediaQuery('(max-height:700px)');
 
@@ -21,31 +22,30 @@ const SchedulePage = () => {
     if (showNext) {
       fetchEventsNext();
     }
-  }, [showNext]);
 
-  useEffect(() => {
     if (isDrawerOpen) {
-      
-      fetchEvents(); // Obtener todos los eventos (por ejemplo, para estadísticas generales)
-      fetchEventsNext(); // Obtiene eventos futuros
-      fetchEventsPast(); // Obtener eventos pasados cuando se abre el Drawer
+      fetchEvents()
     }
-  }, [isDrawerOpen]);
+    
+  }, [showNext, isDrawerOpen]);
 
-  // Funciones para obtener eventos
+
+
+
+  // devuelve todos los eventos
   const fetchEvents = async () => {
     try {
       const events = await getEvents();
       setEvents(events);
     } catch (error) {
-      console.error('Error fetching all events:', error.message);
+      console.error('Error fetching today events:', error.message);
     }
   };
 
   const fetchEventsPast = async () => {
     try {
       const events = await getEventsPast();
-      setEventsPast(events); // Guardar eventos pasados en el estado correspondiente
+      setEventsToday(events);
     } catch (error) {
       console.error('Error fetching past events:', error.message);
     }
@@ -72,10 +72,7 @@ const SchedulePage = () => {
   const handleToggleCompleted = async (eventId) => {
     try {
       await updateEventCompleted(eventId);
-      fetchEvents();
-      fetchEventsToday(); // Refrescar eventos de hoy
-      fetchEventsPast();  // Refrescar eventos pasados
-      fetchEventsNext();  // Refrescar eventos futuros
+      fetchEventsToday();
     } catch (error) {
       console.error('Error updating event completion status:', error.message);
     }
@@ -84,10 +81,8 @@ const SchedulePage = () => {
   const handleToggleEventDay = async (eventId, direction) => {
     try {
       await updateEventDay(eventId, direction);
-      fetchEvents();
       fetchEventsToday();
       fetchEventsNext();
-      fetchEventsPast(); // Refrescar también los eventos pasados si se cambian de día
     } catch (error) {
       console.error('Error updating event day:', error.message);
     }
@@ -95,17 +90,20 @@ const SchedulePage = () => {
 
   const handleDrawerOpen = () => {
     setIsDrawerOpen(true);
+    
   };
 
   const handleDrawerClose = () => {
     setIsDrawerOpen(false);
   };
 
+
   return (
     <>
-      <Container sx={{ height: '100%', paddingLeft: '8px', paddingRight: '8px' }}>
+      <Container sx={{ height: '100%', paddingLeft:'8px', paddingRight: '8px' }}>
         <Grid container sx={{}}>
           <Grid item xs={12} sx={{ display: 'flex', justifyContent: 'space-around' }}>
+            {/* Botón "Resumen Semanal" */}
             <Button
               variant="contained"
               color="info"
@@ -129,6 +127,7 @@ const SchedulePage = () => {
               label="Próximos"
             />
           </Grid>
+          {/* Lista Hoy en 1-2 columnas */}
           <Grid item xs={!showNext ? 12 : 6}>
             <Typography variant="h1" sx={{ margin: '2vh', textDecoration: 'underline', textDecorationSkipInk: 'none' }}>Hoy</Typography>
             {eventsToday.length > 0 && (
@@ -136,14 +135,18 @@ const SchedulePage = () => {
                 events={eventsToday}
                 onToggleCompleted={handleToggleCompleted}
                 onToggleEventDay={handleToggleEventDay}
-                isToday={true}
-
-                isResume={false}
-
+                isToday = {true}
                 showNext={showNext}
-                maxHeight={isSmallScreen ? '58vh' : '61vh'}
+                maxHeight= {isSmallScreen ? '58vh' : '61vh'}
+                
+               
+
               />
             )}
+
+            
+
+
           </Grid>
 
           {showNext && (
@@ -155,11 +158,8 @@ const SchedulePage = () => {
                   onToggleCompleted={handleToggleCompleted}
                   onToggleEventDay={handleToggleEventDay}
                   isToday={false}
-
-                  isResume={false}
-
                   showNext={showNext}
-                  maxHeight={isSmallScreen ? '58vh' : '61vh'}
+                  maxHeight= {isSmallScreen ? '58vh' : '61vh'}
                 />
               </>
             </Grid>
@@ -170,20 +170,22 @@ const SchedulePage = () => {
       <DrawerResume
         isOpen={isDrawerOpen}
         onClose={handleDrawerClose}
-        events={events} // Todos los eventos
-        eventsPast={eventsPast} // Eventos pasados
-        eventsToday={eventsToday} // Eventos de hoy
-        eventsNext={eventsNext} // Eventos futuros
+
+        events={events}
+
+
+
         onToggleCompleted={handleToggleCompleted}
         onToggleEventDay={handleToggleEventDay}
-       
         isToday={true}
-
         showNext={showNext}
+        maxHeight= {isSmallScreen ? '18vh' : '35vh'}
 
-
-        maxHeight={isSmallScreen ? '18vh' : '35vh'}
       />
+
+
+
+      
     </>
   );
 };

@@ -1,5 +1,5 @@
 from django.urls import path, include
-from .views import ActivityList, ActivityCreate, ActivityUpdate, ActivityDelete, EventCreate, EventList, EventTodayList, EventNextList, ToggleEventCompleted, ToggleEventDay, UpdateEventPosition, EventUpdateInfo, EventDelete # Importa las vistas correctamente
+from .views import ActivityList, ActivityCreate, ActivityUpdate, ActivityDelete, EventCreate, EventList, EventPastList, EventTodayList, EventNextList, ToggleEventCompleted, ToggleEventDay, UpdateEventPosition, EventUpdateInfo, EventDelete # Importa las vistas correctamente
 
 urlpatterns = [
 
@@ -12,9 +12,8 @@ urlpatterns = [
     # Eventos
     path('events/create/', EventCreate.as_view(), name='event-create'),
     path('events/', EventList.as_view(), name='event-list'),
+    path('events/past/', EventPastList.as_view(), name='event-past-list'), # eventos anteriores al día actual sin ser lunes
     path('events/today/', EventTodayList.as_view(), name='event-today-list'), # eventos hoy
-  
-
     path('events/next/', EventNextList.as_view(), name='event-next-list'), # eventos próximos hasta el domingo
     path('events/<int:pk>/toggle-completed/', ToggleEventCompleted.as_view(), name='toggle-event-completed'), # Actualiza los eventos como completados o no
     path('events/<int:pk>/<str:direction>/toggle-day/', ToggleEventDay.as_view(), name='toggle-event-day'), # Cambiar el día del evento

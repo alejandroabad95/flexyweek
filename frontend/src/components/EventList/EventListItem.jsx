@@ -5,7 +5,7 @@ import DoneTwoToneIcon from '@mui/icons-material/DoneTwoTone';
 
 
 
-const EventListItem = ({ event, onToggleCompleted, onToggleEventDay, isToday, showNext }) => {
+const EventListItem = ({ event, onToggleCompleted, onToggleEventDay, isResume, isToday, showNext }) => {
 
   const handleToggleCompleted = () => {
     onToggleCompleted(event.id);
@@ -28,7 +28,7 @@ const EventListItem = ({ event, onToggleCompleted, onToggleEventDay, isToday, sh
   const isTask = event.activity.activity_type === 2;
   const isCompleted = event.completed;
 
-  console.log(event)
+
  
   return (
 
@@ -90,7 +90,10 @@ const EventListItem = ({ event, onToggleCompleted, onToggleEventDay, isToday, sh
 
         <Grid container alignItems="center">
           {/* TEXTO */}
-          <Grid item xs={ !showNext ? 9:12}>
+          <Grid item xs={(!showNext) ? 9 : 12}>
+            
+           
+            
             <ListItemText
               primary={
                 <Typography variant="h2" sx={{

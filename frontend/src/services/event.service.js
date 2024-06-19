@@ -49,6 +49,24 @@ const getEvents = async () => {
   }
 };
 
+
+// Función para obtener eventos de hoy
+const getEventsPast = async () => {
+    setToken(); // Asegurarse de que el token está configurado
+    try {
+        const response = await axiosInstance.get('/events/past/');
+        return response.data;
+    } catch (error) {
+        throw new Error('Hubo un problema al obtener los eventos anteriores.');
+    }
+};
+
+
+
+
+
+
+
 // Función para obtener eventos de hoy
 const getEventsToday = async () => {
     setToken(); // Asegurarse de que el token está configurado
@@ -59,7 +77,6 @@ const getEventsToday = async () => {
         throw new Error('Hubo un problema al obtener los eventos de hoy.');
     }
 };
-
 
 
 // Función para obtener eventos próximos
@@ -138,4 +155,4 @@ const deleteEvent = async (eventId) => {
 
 
 
-export { createEvent,getEvents,getEventsToday , getEventsNext, updateEventCompleted, updateEventDay, updateEventPosition, updateEventInfo, deleteEvent };
+export { createEvent,getEvents, getEventsPast, getEventsToday , getEventsNext, updateEventCompleted, updateEventDay, updateEventPosition, updateEventInfo, deleteEvent };

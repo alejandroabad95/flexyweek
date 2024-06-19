@@ -28,3 +28,30 @@ DATABASES = {
 pip install psycopg2-binary # Para usar postgre SQL
 pip install django-cors-headers # para usar cors permitir peticiones desde el front
 pip install django-rest-knox
+pip install celery
+pip install redis
+
+# CELERY con Redis
+
+// redis en local
+brew services start redis
+brew services stop redis
+
+// Ejecuta las tareas en segundo plano
+celery -A flexyweek.celery_config worker -l info
+
+// Monitorización de tareas
+celery -A flexyweek.celery_config worker -l info -E
+
+// Programa las tareas con la configuración definida
+celery -A flexyweek.celery_config beat -l info
+
+# Versiones
+
+v0.1.0
+
+1. Primer dígito cambios significativos
+
+2. Nuevas funcionalidades
+
+3. Número de parche, correción de errores

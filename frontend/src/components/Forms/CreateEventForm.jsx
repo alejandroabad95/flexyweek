@@ -1,5 +1,5 @@
-import React, { useState, useEffect } from 'react';
-import { Dialog, DialogTitle, DialogContent, TextField, DialogActions, Button, ButtonGroup, MenuItem, CircularProgress, Select } from '@mui/material';
+import React, { useState, useEffect, useCallback } from 'react';
+import { Dialog, DialogTitle, DialogContent, TextField, DialogActions, Button, ButtonGroup, MenuItem, Select, CircularProgress } from '@mui/material';
 import { getActivities } from '../../services/activity.service';
 
 const CreateEventForm = ({ open, handleClose, day, priority, handleCreateEvent }) => {
@@ -8,34 +8,36 @@ const CreateEventForm = ({ open, handleClose, day, priority, handleCreateEvent }
   const [activities, setActivities] = useState([]);
   const [loading, setLoading] = useState(false);
   const [filteredActivities, setFilteredActivities] = useState([]);
-  const [showHabits, setShowHabits] = useState(false);
-  const [showTasks, setShowTasks] = useState(false);
+  const [activityTypeFilter, setActivityTypeFilter] = useState(null); // null = todos, 1 = hábitos, 2 = tareas
 
-  
+  const filterActivities = useCallback(() => {
+    let filtered = activities;
+    if (activityTypeFilter === 1) {
+      filtered = filtered.filter(act => act.activity_type === 1);
+    } else if (activityTypeFilter === 2) {
+      filtered = filtered.filter(act => act.activity_type === 2);
+    }
+    setFilteredActivities(filtered);
+  }, [activityTypeFilter, activities]);
 
   useEffect(() => {
     if (open) {
       setLoading(true);
-      getActivities().then(data => {
-        setActivities(data);
-        setLoading(false);
-      }).catch(error => {
-        console.error('Error al cargar actividades:', error.message);
-        setLoading(false);
-      });
+      getActivities()
+        .then(data => {
+          setActivities(data);
+          setLoading(false);
+        })
+        .catch(error => {
+          console.error('Error al cargar actividades:', error.message);
+          setLoading(false);
+        });
     }
   }, [open]);
 
-  const filterActivities = () => {
-    let filtered = activities;
-    if (!showHabits) {
-      filtered = filtered.filter(act => act.activity_type !== 1);
-    }
-    if (!showTasks) {
-      filtered = filtered.filter(act => act.activity_type !== 2);
-    }
-    setFilteredActivities(filtered);
-  };
+  useEffect(() => {
+    filterActivities();
+  }, [filterActivities]);
 
   const submitForm = () => {
     console.log('Datos del formulario:', { day, priority, activity, goal });
@@ -43,25 +45,26 @@ const CreateEventForm = ({ open, handleClose, day, priority, handleCreateEvent }
     handleClose();
   };
 
-  useEffect(() => {
-    filterActivities();
-  }, [showHabits, showTasks, activities]);
+  const handleFilterClick = (type) => {
+    setActivityTypeFilter(type === activityTypeFilter ? null : type);
+  };
 
   return (
     <Dialog open={open} onClose={handleClose}>
       <DialogTitle>Añadir nuevo evento</DialogTitle>
       <DialogContent>
+        {loading && <CircularProgress />} {/* Muestra un indicador de carga si está cargando */}
         <ButtonGroup fullWidth variant="outlined" aria-label="Filtrar actividades">
           <Button
-            onClick={() => setShowHabits(prevState => !prevState)}
-            variant={showHabits ? 'contained' : 'outlined'}
+            onClick={() => handleFilterClick(1)}
+            variant={activityTypeFilter === 1 ? 'contained' : 'outlined'}
             color="primary"
           >
             Hábitos
           </Button>
           <Button
-            onClick={() => setShowTasks(prevState => !prevState)}
-            variant={showTasks ? 'contained' : 'outlined'}
+            onClick={() => handleFilterClick(2)}
+            variant={activityTypeFilter === 2 ? 'contained' : 'outlined'}
             color="primary"
           >
             Tareas
