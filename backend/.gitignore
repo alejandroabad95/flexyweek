@@ -23,3 +23,6 @@ staticfiles/
 
 # Ignorar archivos de entorno
 .env
+
+# Ignorar archivo de configuración de Fly.io
+fly.toml
