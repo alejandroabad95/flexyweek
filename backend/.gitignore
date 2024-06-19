@@ -20,3 +20,6 @@ staticfiles/
 *.pyc
 *.pyo
 *.pyc
+
+# Ignorar archivos de entorno
+.env

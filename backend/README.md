@@ -28,6 +28,8 @@ DATABASES = {
 pip install psycopg2-binary # Para usar postgre SQL
 pip install django-cors-headers # para usar cors permitir peticiones desde el front
 pip install django-rest-knox
+pip install python-dotenv
+
 pip install celery
 pip install redis
 
