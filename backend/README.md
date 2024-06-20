@@ -33,6 +33,8 @@ pip install python-dotenv
 pip install celery
 pip install redis
 
+pip install gunicorn
+
 # CELERY con Redis
 
 // redis en local

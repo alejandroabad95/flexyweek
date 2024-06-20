@@ -1,32 +1,29 @@
+# flyctl launch added from .gitignore
 # Archivos de configuración locales
-*.pyc
-*.sqlite3
-*.pyo
-*.pyc
-__pycache__/
+**/*.pyc
+**/*.sqlite3
+**/*.pyo
+**/*.pyc
+**/__pycache__
 
 # Carpeta de entorno virtual (si utilizas uno)
-venv/
+**/venv
 
 # Carpeta de archivos estáticos compilados
-staticfiles/
+**/staticfiles
 
 # Carpeta de archivos temporales
-*.log
+**/*.log
 
 # Archivos generados por IDEs o editores de texto
-.vscode/
-.idea/
-*.pyc
-*.pyo
-*.pyc
-
-# Archivos específicos de Docker y Gunicorn
-Dockerfile
-gunicorn_config.py
+**/.vscode
+**/.idea
+**/*.pyc
+**/*.pyo
+**/*.pyc
 
 # Ignorar archivos de entorno
-.env
+**/.env
 
 # Ignorar archivo de configuración de Fly.io
-fly.toml
+**/fly.toml

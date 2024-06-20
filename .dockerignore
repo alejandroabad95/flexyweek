@@ -1,0 +1,54 @@
+# flyctl launch added from backend/.gitignore
+# Archivos de configuración locales
+backend/**/*.pyc
+backend/**/*.sqlite3
+backend/**/*.pyo
+backend/**/*.pyc
+backend/**/__pycache__
+
+# Carpeta de entorno virtual (si utilizas uno)
+backend/**/venv
+
+# Carpeta de archivos estáticos compilados
+backend/**/staticfiles
+
+# Carpeta de archivos temporales
+backend/**/*.log
+
+# Archivos generados por IDEs o editores de texto
+backend/**/.vscode
+backend/**/.idea
+backend/**/*.pyc
+backend/**/*.pyo
+backend/**/*.pyc
+
+# Ignorar archivos de entorno
+backend/**/.env
+
+# Ignorar archivo de configuración de Fly.io
+backend/**/fly.toml
+
+# flyctl launch added from frontend/.gitignore
+# See https://help.github.com/articles/ignoring-files/ for more about ignoring files.
+
+# dependencies
+frontend/node_modules
+frontend/.pnp
+frontend/**/.pnp.js
+
+# testing
+frontend/coverage
+
+# production
+frontend/build
+
+# misc
+frontend/**/.DS_Store
+frontend/**/.env.local
+frontend/**/.env.development.local
+frontend/**/.env.test.local
+frontend/**/.env.production.local
+
+frontend/**/npm-debug.log*
+frontend/**/yarn-debug.log*
+frontend/**/yarn-error.log*
