@@ -38,7 +38,7 @@ export function useAuthService() {
             }
 
             // Si no se ha alcanzado el límite, procede con el registro
-            await axios.post(`${process.env.REACT_APP_API_URL}/signup/`, {
+            await axios.post(`${process.env.REACT_APP_API_URL}/auth/signup/`, {
                 username,
                 password,
                 email,
