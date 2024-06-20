@@ -9,27 +9,49 @@ DEBUG = False
 ALLOWED_HOSTS = os.getenv('ALLOWED_HOSTS', '').split(',')
 
 # Configuración de la base de datos para el entorno de producción
+# DATABASES = {
+#     'default': {
+#         'ENGINE': 'django.db.backends.postgresql',
+#         'HOST': os.getenv('PROD_DB_HOST'),
+       
+#     }
+# }
+
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
         'HOST': os.getenv('PROD_DB_HOST'),
-       
+        'NAME': os.getenv('PROD_DB_NAME'),
+        'USER': os.getenv('PROD_DB_USER'),
+        'PASSWORD': os.getenv('PROD_DB_PASSWORD'),
+        'PORT': os.getenv('PROD_DB_PORT'),
     }
 }
+
+
+
+
 
 # Configuración para CORS en el entorno de producción
 CORS_ALLOWED_ORIGINS = os.getenv('CORS_ALLOWED_ORIGINS', '').split(',')
 
-# Configuración de archivos estáticos en producción
+# Configuración para CORS en el entorno de producción
+CSRF_TRUSTED_ORIGINS = os.getenv('CSRF_TRUSTED_ORIGINS', '').split(',')
 
-# STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
-# STATIC_URL = '/static/'
 
 # Seguridad adicional
 SECURE_BROWSER_XSS_FILTER = True
 X_FRAME_OPTIONS = 'DENY'
-SECURE_SSL_REDIRECT = True
+# SECURE_SSL_REDIRECT = True
 
 # Configuración adicional para Celery production
 CELERY_BROKER_URL = os.getenv('PROD_CELERY_BROKER_URL', 'redis://localhost:6379/0')
 CELERY_RESULT_BACKEND = os.getenv('PROD_CELERY_RESULT_BACKEND', 'redis://localhost:6379/0')
+
+
+# Configuración de archivos estáticos
+# Static files (CSS, JavaScript, Images)
+STATIC_ROOT = BASE_DIR / 'staticfiles'
+
+# WhiteNoise configuration
+STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'

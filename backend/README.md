@@ -34,6 +34,7 @@ pip install celery
 pip install redis
 
 pip install gunicorn
+pip install whitenoise
 
 # CELERY con Redis
 
