@@ -120,9 +120,6 @@ const theme = createTheme({
   },
 
 
-
-
-
   components: {
 
     // Componentes Actividades y Horario

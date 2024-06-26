@@ -51,7 +51,6 @@ class ActivityDelete(generics.DestroyAPIView):
 
 
 # EVENTOS
-
 # Crea eventos
 class EventCreate(generics.CreateAPIView):
     serializer_class = EventSerializer

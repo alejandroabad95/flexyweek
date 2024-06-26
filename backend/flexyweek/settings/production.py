@@ -2,20 +2,14 @@
 
 from .base import *
 
+# SECURITY WARNING: keep the secret key used in production secret!
+SECRET_KEY = os.getenv('SECRET_KEY', 'SECRET_KEY')
+
 # Desactivar el modo de depuración en producción
 DEBUG = False
 
 # Establecer hosts permitidos en el entorno de producción
 ALLOWED_HOSTS = os.getenv('ALLOWED_HOSTS', '').split(',')
-
-# Configuración de la base de datos para el entorno de producción
-# DATABASES = {
-#     'default': {
-#         'ENGINE': 'django.db.backends.postgresql',
-#         'HOST': os.getenv('PROD_DB_HOST'),
-       
-#     }
-# }
 
 DATABASES = {
     'default': {
@@ -27,10 +21,6 @@ DATABASES = {
         'PORT': os.getenv('PROD_DB_PORT'),
     }
 }
-
-
-
-
 
 # Configuración para CORS en el entorno de producción
 CORS_ALLOWED_ORIGINS = os.getenv('CORS_ALLOWED_ORIGINS', '').split(',')

@@ -7,8 +7,7 @@ from pathlib import Path
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent.parent
 
-# SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = os.getenv('DJANGO_SECRET_KEY')
+
 
 # Application definition
 INSTALLED_APPS = [
@@ -33,16 +32,17 @@ REST_FRAMEWORK = {
 }
 
 MIDDLEWARE = [
-    'corsheaders.middleware.CorsMiddleware',
-    'django.middleware.security.SecurityMiddleware',
-    'django.contrib.sessions.middleware.SessionMiddleware',
-    'django.middleware.common.CommonMiddleware',
-    'django.middleware.csrf.CsrfViewMiddleware',
-    'django.contrib.auth.middleware.AuthenticationMiddleware',
-    'django.contrib.messages.middleware.MessageMiddleware',
-    'django.middleware.clickjacking.XFrameOptionsMiddleware',
-    'whitenoise.middleware.WhiteNoiseMiddleware',  # WhiteNoise Middleware
+    'django.middleware.security.SecurityMiddleware',  # Antes que todo, para la seguridad
+    'whitenoise.middleware.WhiteNoiseMiddleware',      # Antes que el resto de middleware de procesamiento de respuesta
+    'django.contrib.sessions.middleware.SessionMiddleware',  # Manejo de sesiones
+    'corsheaders.middleware.CorsMiddleware',           # Gestión de CORS
+    'django.middleware.common.CommonMiddleware',       # Funcionalidades comunes
+    'django.middleware.csrf.CsrfViewMiddleware',       # Protección CSRF
+    'django.contrib.auth.middleware.AuthenticationMiddleware',  # Autenticación de usuario
+    'django.contrib.messages.middleware.MessageMiddleware',    # Mensajes de sesión
+    'django.middleware.clickjacking.XFrameOptionsMiddleware',  # Protección contra clickjacking
 ]
+
 
 ROOT_URLCONF = 'flexyweek.urls'
 

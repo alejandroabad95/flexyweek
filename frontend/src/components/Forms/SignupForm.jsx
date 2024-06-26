@@ -1,29 +1,41 @@
 import React, { useState } from 'react';
+import { TextField, Button, Typography, Box, Paper, IconButton, InputAdornment, FormControl, InputLabel, OutlinedInput, useTheme } from '@mui/material';
+import { Visibility, VisibilityOff } from '@mui/icons-material';
 
-const SignupForm = ({ onSignup, error }) => {
+const SignupForm = ({ onSignup, paperElevation, error }) => {
     const [credentials, setCredentials] = useState({ username: '', password: '', email: '' });
     const [validationError, setValidationError] = useState('');
+    const [showPassword, setShowPassword] = useState(false);
+    const theme = useTheme();
 
-    // Función para manejar cambios en los campos del formulario
     const handleChange = (e) => {
         const { id, value } = e.target;
         setCredentials((prevCredentials) => ({
             ...prevCredentials,
             [id]: value
         }));
+
+        // Validar correo electrónico en tiempo real si es necesario
+        if (id === 'email') {
+            if (!value) {
+                setValidationError('El correo electrónico es obligatorio');
+            } else if (!validateEmail(value)) {
+                setValidationError('El formato del correo electrónico no es válido');
+            } else {
+                setValidationError('');
+            }
+        }
     };
 
-    // Función para validar el formato del correo electrónico
     const validateEmail = (email) => {
         const re = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
         return re.test(String(email).toLowerCase());
     };
 
-    // Función para manejar el envío del formulario
     const handleSubmit = (e) => {
         e.preventDefault();
 
-        // Validar que el correo electrónico no esté vacío y tenga un formato correcto
+        // Validar una vez más antes de enviar el formulario
         if (!credentials.email) {
             setValidationError('El correo electrónico es obligatorio');
             return;
@@ -32,52 +44,100 @@ const SignupForm = ({ onSignup, error }) => {
             return;
         }
 
-        // Si todo es correcto, reseteamos el mensaje de error de validación y llamamos a la función de registro
+        // Limpiar mensaje de error de validación
         setValidationError('');
+
+        // Llamar a la función de registro
         onSignup(credentials);
     };
 
+    const handleClickShowPassword = () => {
+        setShowPassword(!showPassword);
+    };
+
+    const handleMouseDownPassword = (e) => {
+        e.preventDefault();
+    };
+
     return (
-        <div>
-            <h2>Registrarse</h2>
-            {/* Mostrar error del backend si existe */}
-            {error && <p style={{ color: 'red' }}>{error}</p>}
-            {/* Mostrar error de validación si existe */}
-            {validationError && <p style={{ color: 'red' }}>{validationError}</p>}
-            <form onSubmit={handleSubmit}>
-                <div>
-                    <label htmlFor="username">Usuario:</label>
-                    <input
-                        type="text"
-                        id="username"
-                        value={credentials.username}
-                        onChange={handleChange}
-                        required
-                    />
-                </div>
-                <div>
-                    <label htmlFor="password">Contraseña:</label>
-                    <input
-                        type="password"
-                        id="password"
-                        value={credentials.password}
-                        onChange={handleChange}
-                        required
-                    />
-                </div>
-                <div>
-                    <label htmlFor="email">Correo electrónico:</label>
-                    <input
-                        type="email"
-                        id="email"
-                        value={credentials.email}
-                        onChange={handleChange}
-                        required
-                    />
-                </div>
-                <button type="submit">Registrarse</button>
-            </form>
-        </div>
+        <Paper elevation={paperElevation} style={{ marginBottom: theme.spacing(4) }}>
+            <Box p={3}>
+                <Typography variant='h1' align='center' style={{ marginBottom: 20 }}>
+                    Registrarse
+                </Typography>
+
+                {error && (
+                    <Typography variant='body1' color='error' align='center' style={{ marginBottom: theme.spacing(2)}}>
+                        {error}
+                    </Typography>
+                )}
+
+                {validationError && (
+                    <Typography variant='body1' color='error' align='center' style={{ marginBottom: theme.spacing(2)}}>
+                        {validationError}
+                    </Typography>
+                )}
+
+                <form onSubmit={handleSubmit}>
+                    <Box mb={3}>
+                        <TextField
+                            fullWidth
+                            id="username"
+                            label="Usuario"
+                            variant="outlined"
+                            value={credentials.username}
+                            onChange={handleChange}
+                            
+                        />
+                    </Box>
+
+                    <Box mb={3}>
+                        <FormControl fullWidth variant="outlined">
+                            <InputLabel htmlFor="outlined-adornment-password">Contraseña</InputLabel>
+                            <OutlinedInput
+                                id="password"
+                                type={showPassword ? 'text' : 'password'}
+                                value={credentials.password}
+                                onChange={handleChange}
+                                endAdornment={
+                                    <InputAdornment position="end">
+                                        <IconButton
+                                            aria-label="toggle password visibility"
+                                            onClick={handleClickShowPassword}
+                                            onMouseDown={handleMouseDownPassword}
+                                            edge="end"
+                                        >
+                                            {showPassword ? <VisibilityOff /> : <Visibility />}
+                                        </IconButton>
+                                    </InputAdornment>
+                                }
+                                label="Contraseña"
+                                
+                            />
+                        </FormControl>
+                    </Box>
+
+                    <Box mb={3}>
+                        <TextField
+                            fullWidth
+                            id="email"
+                            label="Correo electrónico"
+                            type="email"
+                            variant="outlined"
+                            value={credentials.email}
+                            onChange={handleChange}
+                            
+                        />
+                    </Box>
+
+                    <Box textAlign='center'>
+                        <Button variant="contained" color="primary" type="submit">
+                            Registrarse
+                        </Button>
+                    </Box>
+                </form>
+            </Box>
+        </Paper>
     );
 };
 

@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../contexts/auth.context';
 
 export function useAuthService() {
+
     const navigate = useNavigate();
     const { updateUserState } = useAuth();
 
@@ -21,10 +22,19 @@ export function useAuthService() {
             // Redirigir a la página de actividades
             navigate('/activities');
         } catch (error) {
-            console.error('Error al iniciar sesión:', error.response?.data);
             throw new Error('Nombre de usuario o contraseña incorrectos');
         }
     }
+
+
+
+
+
+
+
+
+
+    
 
     async function signup(username, password, email) {
         try {

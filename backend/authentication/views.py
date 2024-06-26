@@ -28,20 +28,35 @@ class AuthInfoApiView(APIView):
         return Response(serializer.data, status=status.HTTP_200_OK)
     
 
+# class LoginApiView(APIView):
+#     def post(self, request):
+#         username = request.data.get('username')
+#         password = request.data.get('password')
+
+#         user = User.objects.filter(username=username).first()
+#         if user is None or not user.check_password(password):
+#             return Response({'error': 'Invalid username or password'}, status=status.HTTP_401_UNAUTHORIZED)
+
+#         # Autenticar al usuario y generar el token de autenticación. En Knox por defecto la Key es Token 
+#         _, token = AuthToken.objects.create(user)
+#         return Response({'token': token}, status=status.HTTP_200_OK)
+    
 class LoginApiView(APIView):
     def post(self, request):
         username = request.data.get('username')
         password = request.data.get('password')
-
         user = User.objects.filter(username=username).first()
-        if user is None or not user.check_password(password):
-            return Response({'error': 'Invalid username or password'}, status=status.HTTP_401_UNAUTHORIZED)
 
+        # Si no se encuentra por nombre de usuario, buscar por email
+        if not user:
+            user = User.objects.filter(email=username).first()
+        # Verificar las credenciales
+        if user is None or not user.check_password(password):
+            return Response({'error': 'Invalid username/email or password'}, status=status.HTTP_401_UNAUTHORIZED)
         # Autenticar al usuario y generar el token de autenticación. En Knox por defecto la Key es Token 
         _, token = AuthToken.objects.create(user)
         return Response({'token': token}, status=status.HTTP_200_OK)
-
-
+    
 class RegisterApiView(APIView):
     def post(self, request):
         serializer = UserSerializer(data=request.data)
