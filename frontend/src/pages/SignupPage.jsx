@@ -3,7 +3,7 @@ import { Link, useNavigate } from 'react-router-dom';
 import { useAuthService } from '../services/auth.service';
 import { useAuth } from '../contexts/auth.context';
 import SignupForm from '../components/Forms/SignupForm';
-import { Container, Grid, Typography, Link as MuiLink, Paper, Box } from '@mui/material';
+import { Container, Grid, Typography, Link as MuiLink, Paper } from '@mui/material';
 
 function SignupPage() {
     const [error, setError] = useState('');
