@@ -5,17 +5,17 @@ import { TransitionGroup } from 'react-transition-group';
 import ActivityItem from './ActivityItem';
 import CreateActivityForm from '../Forms/CreateActivityForm';
 import AddBoxIcon from '@mui/icons-material/AddBox';
+import ErrorMessage from '../ErrorMessage/ErrorMessage';
 
 
 const ActivityList = ({filteredActivities,handleTypeChange,currentType, isAddingActivity, newActivityName,handleNewActivityNameChange, handleAddActivity,
-error, editingActivityId, updatedActivityName,handleUpdatedActivityNameChange,handleSaveUpdatedActivity,handleEditActivity,handleDeleteActivity,handleStartAddActivity,newActivityInputRef,
+errors, editingActivityId, updatedActivityName,handleUpdatedActivityNameChange,handleSaveUpdatedActivity,handleEditActivity,handleDeleteActivity,handleStartAddActivity,newActivityInputRef,
 editingActivityInputRef, handleShowMenu, showMenu
   
 }) => {
 
   const theme = useTheme();
 
-  
 
   return (
     <>
@@ -60,7 +60,15 @@ editingActivityInputRef, handleShowMenu, showMenu
             )}
           </IconButton>
 
+          
+         {/* Se genera solo cuando hay error de límite de actividades */}
+          {errors.serverLimitActivities && <ErrorMessage message={errors.serverLimitActivities} />} 
+          
+          {errors.serverCreateActivity && <ErrorMessage message={errors.serverAddActivity} />} 
 
+          {errors.serverEditActivity && <ErrorMessage message={errors.serverEditActivity} />} 
+
+          
 
           {isAddingActivity && (
           <CreateActivityForm
@@ -68,11 +76,17 @@ editingActivityInputRef, handleShowMenu, showMenu
               handleNewActivityNameChange={handleNewActivityNameChange}
               handleAddActivity={handleAddActivity}
               newActivityInputRef={newActivityInputRef}
+              errors={errors}
             />
           )}
           
         </Grid>
-        {error && <p style={{ color: 'red' }}>{error}</p>}
+
+
+       
+        {errors && <ErrorMessage message={errors.serverLimitActivities} />} 
+        
+        
       </Grid>
 
       {/* Lista de actividades */}
@@ -96,6 +110,7 @@ editingActivityInputRef, handleShowMenu, showMenu
                 handleShowMenu={handleShowMenu}
                 handleDeleteActivity={handleDeleteActivity}
                 editingActivityInputRef={editingActivityInputRef}
+                errors={errors}
               />
             </Collapse>
           ))}

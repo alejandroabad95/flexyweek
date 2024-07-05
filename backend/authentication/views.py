@@ -28,35 +28,6 @@ class AuthInfoApiView(APIView):
         return Response(serializer.data, status=status.HTTP_200_OK)
     
 
-# class LoginApiView(APIView):
-#     def post(self, request):
-#         username = request.data.get('username')
-#         password = request.data.get('password')
-
-#         user = User.objects.filter(username=username).first()
-#         if user is None or not user.check_password(password):
-#             return Response({'error': 'Invalid username or password'}, status=status.HTTP_401_UNAUTHORIZED)
-
-#         # Autenticar al usuario y generar el token de autenticación. En Knox por defecto la Key es Token 
-#         _, token = AuthToken.objects.create(user)
-#         return Response({'token': token}, status=status.HTTP_200_OK)
-    
-class LoginApiView(APIView):
-    def post(self, request):
-        username = request.data.get('username')
-        password = request.data.get('password')
-        user = User.objects.filter(username=username).first()
-
-        # Si no se encuentra por nombre de usuario, buscar por email
-        if not user:
-            user = User.objects.filter(email=username).first()
-        # Verificar las credenciales
-        if user is None or not user.check_password(password):
-            return Response({'error': 'Invalid username/email or password'}, status=status.HTTP_401_UNAUTHORIZED)
-        # Autenticar al usuario y generar el token de autenticación. En Knox por defecto la Key es Token 
-        _, token = AuthToken.objects.create(user)
-        return Response({'token': token}, status=status.HTTP_200_OK)
-    
 class RegisterApiView(APIView):
     def post(self, request):
         serializer = UserSerializer(data=request.data)
@@ -65,12 +36,41 @@ class RegisterApiView(APIView):
             # Autenticar al usuario y generar el token de autenticación
             _, token = AuthToken.objects.create(user)
             return Response({'token': token}, status=status.HTTP_201_CREATED)
+        
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
 
 class CountUsersApiView(APIView):
     def get(self, request):
         user_count = User.objects.count()
         return Response({'count': user_count}, status=status.HTTP_200_OK)
+
+
+class LoginApiView(APIView):
+    def post(self, request):
+        try:
+            username = request.data.get('username')
+            password = request.data.get('password')
+
+            user = User.objects.filter(username=username).first()
+
+            # Si no se encuentra por nombre de usuario, buscar por email
+            if not user:
+                user = User.objects.filter(email=username).first()
+
+            # Verificar las credenciales
+            if user is None or not user.check_password(password):
+                return Response({'error': 'Nombre de usuario o contraseña incorrectos'}, status=status.HTTP_401_UNAUTHORIZED)
+            
+            # Autenticar al usuario y generar el token de autenticación. En Knox por defecto la Key es Token 
+            _, token = AuthToken.objects.create(user)
+            return Response({'token': token}, status=status.HTTP_200_OK)
+        
+        except Exception as e:
+            # Para cualquier otro tipo de error, responder con un error interno del servidor
+            return Response({'error': 'Error interno del servidor'}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+
 
 
 class ChangePasswordApiView(APIView):

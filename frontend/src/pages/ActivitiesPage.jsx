@@ -10,7 +10,10 @@ function ActivitiesPage() {
     const [currentType, setCurrentType] = useState(1);
     const [isAddingActivity, setIsAddingActivity] = useState(false);
     const [newActivityName, setNewActivityName] = useState('');
-    const [error, setError] = useState(''); // Estado para manejar el mensaje de error
+    // const [error, setError] = useState(''); 
+    const [errors, setErrors] = useState('');
+
+
     const [editingActivityId, setEditingActivityId] = useState(null); // Estado para manejar el ID de la actividad que se está editando
     const [updatedActivityName, setUpdatedActivityName] = useState(''); // Estado para manejar el nuevo nombre de la actividad en edición
     const [showMenu, setShowMenu] = useState(false); // Nuevo estado para mostrar el menú
@@ -59,6 +62,7 @@ function ActivitiesPage() {
                 
                 if (!clickedElement.closest('.MuiInputBase-input')) {
                     setEditingActivityId(null);
+                    setErrors('');
                 }
             }
         };
@@ -89,15 +93,39 @@ function ActivitiesPage() {
 
     };
 
-    // Función para agregar una nueva actividad
-    const handleAddActivity = async () => {
-        if (newActivityName.trim() === '') {
-            setError('Por favor, complete el nombre de la actividad.');
-            return;
-        }
+    // Función para agregar una nueva actividad vieja 
+    // const handleAddActivity = async () => {
+    //     if (newActivityName.trim() === '') {
+    //         setError('Por favor, complete el nombre de la actividad.');
+    //         return;
+    //     }
 
-        setError(''); // Limpia el mensaje de error si no hay errores
+    //     setError(''); // Limpia el mensaje de error si no hay errores
 
+    //     const newActivity = {
+    //         name: newActivityName,
+    //         activity_type: currentType,
+    //     };
+
+    //     const addedActivity = await createActivity(newActivity);
+
+    //     // Agrega la nueva actividad a la lista de actividades
+    //     const updatedActivities = [...activities, addedActivity];
+    
+    //     // Ordena la lista de actividades por created_at de más recientes a antiguas
+    //     const sortedActivities = updatedActivities.sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
+    
+    //     // setActivities([...activities, addedActivity]);
+
+    //     setActivities(sortedActivities);
+
+    //     setNewActivityName('');
+    //     setIsAddingActivity(false);
+    // };
+
+// Función para agregar una nueva actividad
+const handleAddActivity = async () => {
+    try {
         const newActivity = {
             name: newActivityName,
             activity_type: currentType,
@@ -107,17 +135,28 @@ function ActivitiesPage() {
 
         // Agrega la nueva actividad a la lista de actividades
         const updatedActivities = [...activities, addedActivity];
-    
         // Ordena la lista de actividades por created_at de más recientes a antiguas
         const sortedActivities = updatedActivities.sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
-    
-        // setActivities([...activities, addedActivity]);
-
         setActivities(sortedActivities);
 
         setNewActivityName('');
         setIsAddingActivity(false);
-    };
+
+    } catch (e) {
+        // Metemos los errores configurados en el servicio
+        if (e.validationErrors) {
+            // Si hay errores de validación, actualizarlos en el estado
+            setErrors(e.validationErrors);
+        } else if (e.validationServerErrors) {
+            // Errores de validación del servidor específicos como el límite de actividades
+            setErrors(e.validationServerErrors);
+        } else {
+            setErrors(e.serverErrors);
+        }
+    }
+};
+
+
 
     // Función para manejar la edición de una actividad
     const handleEditActivity = (activity) => {
@@ -151,12 +190,27 @@ function ActivitiesPage() {
                 return activity;
             });
             setActivities(updatedActivities);
-        } catch (error) {
-            setError('Hubo un problema al actualizar la actividad.');
+        } catch (e) {
+            // setErrors('Hubo un problema al actualizar la actividad.');
+            if (e.validationErrors) {
+                // Si hay errores de validación, actualizarlos en el estado
+                setErrors(e.validationErrors);
+            } else if (e.validationServerErrors) {
+                // Errores de validación del servidor específicos como el límite de actividades
+                setErrors(e.validationServerErrors);
+            } else {
+                setErrors(e.serverErrors);
+            }
+            
         }
 
-        setEditingActivityId(null);
+        // setEditingActivityId(null);
     };
+
+
+
+
+
 
     // Función para manejar el cambio de nombre de la actividad actualizada
     const handleUpdatedActivityNameChange = (event) => {
@@ -167,7 +221,7 @@ function ActivitiesPage() {
     const handleCancelAddActivity = () => {
         setNewActivityName('');
         setIsAddingActivity(false);
-        setError(''); // Limpia el mensaje de error cuando se cancela agregar actividad
+        setErrors(''); // Limpia el mensaje de error cuando se cancela agregar actividad
     };
 
     // Función para mostrar el menú al hacer clic en el icono de engranaje
@@ -185,7 +239,7 @@ function ActivitiesPage() {
             setActivities(updatedActivities);
         }
     } catch (error) {
-        setError(`Hubo un problema al eliminar la actividad con ID ${activityId}.`);
+        setErrors(`Hubo un problema al eliminar la actividad con ID ${activityId}.`);
     }
     };
 
@@ -212,7 +266,11 @@ function ActivitiesPage() {
                             newActivityName={newActivityName}
                             handleNewActivityNameChange={handleNewActivityNameChange}
                             handleAddActivity={handleAddActivity}
-                            error={error}
+                            // error={error}
+                        
+                            errors={errors}
+                        
+
                             editingActivityId={editingActivityId}
                             updatedActivityName={updatedActivityName}
                             handleUpdatedActivityNameChange={handleUpdatedActivityNameChange}

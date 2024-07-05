@@ -28,5 +28,9 @@ gunicorn_config.py
 # Ignorar archivos de entorno
 .env
 
+# Ignorar scripts de python
+test_redis_connection.py
+
+
 # Ignorar archivo de configuración de Fly.io
 fly.toml

@@ -3,7 +3,10 @@ from .views import LoginApiView, RegisterApiView, CountUsersApiView, LogoutApiVi
 
 urlpatterns = [
     path('user/', AuthInfoApiView.as_view(), name='user'),
-    path('count-users/', CountUsersApiView.as_view(), name='count_users'),  
+    path('count-users/', CountUsersApiView.as_view(), name='count_users'),
+
+    
+      
     path('login/', LoginApiView.as_view(), name='login'),
     path('signup/', RegisterApiView.as_view(), name='signup'),
     path('logout/', LogoutApiView.as_view(), name='logout'),

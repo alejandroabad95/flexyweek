@@ -1,8 +1,9 @@
 import React from 'react';
-import { ListItem, IconButton, TextField, Typography, Paper, Stack, useTheme } from '@mui/material';
+import { ListItem, IconButton, Typography, Paper, Stack, useTheme } from '@mui/material';
 import { Delete, Edit, Settings } from '@mui/icons-material';
+import EditActivityForm from '../Forms/EditActivityForm';
 
-const ActivityItem = ({ activity, editingActivityId, updatedActivityName, handleUpdatedActivityNameChange, handleSaveUpdatedActivity, handleEditActivity, showMenu, handleShowMenu, handleDeleteActivity, editingActivityInputRef }) =>
+const ActivityItem = ({ activity, editingActivityId, updatedActivityName, handleUpdatedActivityNameChange, handleSaveUpdatedActivity, handleEditActivity, showMenu, handleShowMenu, handleDeleteActivity, editingActivityInputRef, errors }) =>
 
 {
 
@@ -72,8 +73,10 @@ const ActivityItem = ({ activity, editingActivityId, updatedActivityName, handle
 
     {isEditing ? (
           <>
-       
-        <TextField
+            
+          {/* Edición antigua */}
+            
+        {/* <TextField
           value={updatedActivityName}
           onChange={handleUpdatedActivityNameChange}
           inputRef={editingActivityInputRef}
@@ -89,11 +92,19 @@ const ActivityItem = ({ activity, editingActivityId, updatedActivityName, handle
           
           },
         }}
-              
-              />
+        /> */}
+            
+        <EditActivityForm
+            updatedActivityName={updatedActivityName}
+            handleUpdatedActivityNameChange={handleUpdatedActivityNameChange}
+            handleSaveUpdatedActivity={handleSaveUpdatedActivity}
+            activityId={activity.id}
+            editingActivityInputRef={editingActivityInputRef}
+            errors={errors}
+          />
         
         
-      </>
+        </>
       ) : (
         <>
           <Typography variant="h2">

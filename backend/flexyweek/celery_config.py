@@ -3,19 +3,22 @@
 from __future__ import absolute_import, unicode_literals
 import os
 from celery import Celery
-from celery.schedules import crontab  # Ajuste en la importación para `crontab`
+from celery.schedules import crontab
 
-# Establece la configuración de Django para Celery
+# Establecer la configuración de Django para Celery
 os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'flexyweek.settings')
 
-# Crea una instancia de Celery
+# Crear una instancia de Celery
 app = Celery('flexyweek')
 
-# Carga la configuración de Celery desde el archivo settings.py
+# Cargar la configuración de Celery desde el archivo settings.py
 app.config_from_object('django.conf:settings', namespace='CELERY')
 
 # Autodiscover tasks de todas las aplicaciones listadas en INSTALLED_APPS de settings.py
 app.autodiscover_tasks()
+
+# Configuración específica para Celery 6.0 y superior
+app.conf.broker_connection_retry_on_startup = True  # Para mantener el comportamiento de reintentos al inicio
 
 # Define las tareas programadas (beat schedule)
 app.conf.beat_schedule = {

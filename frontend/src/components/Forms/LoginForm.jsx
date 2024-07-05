@@ -1,8 +1,9 @@
 import React, { useState } from 'react';
-import { TextField, Button, Typography, Box, Paper, IconButton, InputAdornment, FormControl, InputLabel, OutlinedInput, useTheme } from '@mui/material';
+import { TextField, Button, Typography, Box, Paper, IconButton, InputAdornment, FormControl, InputLabel, OutlinedInput, FormHelperText, useTheme } from '@mui/material';
 import { Visibility, VisibilityOff } from '@mui/icons-material';  
+import ErrorMessage from '../ErrorMessage/ErrorMessage';
 
-const LoginForm = ({ onLogin,paperElevation,error }) => {
+const LoginForm = ({ onLogin,paperElevation,errors }) => {
     const [credentials, setCredentials] = useState({ username: '', password: '' });
     const [showPassword, setShowPassword] = useState(false);
     const theme = useTheme();
@@ -37,11 +38,14 @@ const LoginForm = ({ onLogin,paperElevation,error }) => {
                     Acceder
                 </Typography>
 
-                {error && (
-                    <Typography variant='body1' color='error' align='center' style={{ marginBottom: theme.spacing(2)}}>
-                        {error}
-                    </Typography>
-                )}
+                {/* Error no contemplado servidor */}
+                {errors.serverLogin && <ErrorMessage message={errors.serverLogin} />} 
+
+                {errors.validationGeneral && <ErrorMessage message={errors.validationGeneral} />}
+
+                {errors.serverLoginCredentials && <ErrorMessage message={errors.serverLoginCredentials} />}
+
+
 
                 <form onSubmit={handleSubmit}>
                     <Box mb={3}>
@@ -52,11 +56,15 @@ const LoginForm = ({ onLogin,paperElevation,error }) => {
                             variant="outlined"
                             value={credentials.username}
                             onChange={handleChange}
+                            // centremonos aquí
+                            error={!!errors.username || !!errors.serverUniqueUser}
+                            helperText={errors.username || errors.serverUniqueUser}
+
                         />
                     </Box>
 
                     <Box mb={4}>
-                        <FormControl fullWidth variant="outlined">
+                        <FormControl fullWidth variant="outlined" error={!!errors.password}>
                             <InputLabel htmlFor="outlined-adornment-password">Contraseña</InputLabel>
                             <OutlinedInput
                                 id="password"
@@ -77,6 +85,11 @@ const LoginForm = ({ onLogin,paperElevation,error }) => {
                                 }
                                 label="Contraseña"
                             />
+                             {errors.password && (
+                                <FormHelperText>{errors.password}</FormHelperText>
+                            )}
+
+
                         </FormControl>
                     </Box>
 

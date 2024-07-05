@@ -6,7 +6,7 @@ import LoginForm from '../components/Forms/LoginForm';
 import { Paper, Container, Grid, Typography, Box, Link as MuiLink } from '@mui/material';
 
 function LoginPage() {
-    const [error, setError] = useState('');
+    const [errors, setErrors] = useState('');
     const navigate = useNavigate();
     const { login } = useAuthService();
     const { user } = useAuth();
@@ -47,15 +47,29 @@ function LoginPage() {
         try {
             await login(credentials.username, credentials.password);
         } catch (e) {
-            setError(e.message);
+            //
+            // setError(e.message);
+
+            if (e.validationErrors) {
+                // Si hay errores de validación, actualizarlos en el estado
+                setErrors(e.validationErrors);
+            } 
+            
+            else {
+                setErrors(e.serverErrors);
+            }
+           
+
+
+
         }
     };
 
     return (
-        <Container maxWidth="sm" style={{ marginTop: '5vh' }}>
+        <Container maxWidth="sm" style={{ marginTop: '1vh' }}>
             <Grid container>
                 <Grid item xs={12} onClick={handleClick} ref={formRef}>
-                    <LoginForm onLogin={handleLogin} error={error} paperElevation={paperElevation} />
+                    <LoginForm onLogin={handleLogin} errors={errors} paperElevation={paperElevation} />
 
                     <Paper elevation={paperElevation}>
                         <Box p={3} mt={3}>

@@ -30,7 +30,7 @@ class Activity(models.Model):
         
         # Verificar si el número de actividades existentes supera el límite
         if existing_activities_count >= self.TOTAL_ACTIVITY_LIMIT:
-            raise ValidationError(f"No puedes tener más de {self.TOTAL_ACTIVITY_LIMIT} actividades.")
+            raise ValidationError(f"No puedes tener más de {self.TOTAL_ACTIVITY_LIMIT} actividades en total.")
         
         # Llamar al método save original si no se ha alcanzado el límite
         super().save(*args, **kwargs)

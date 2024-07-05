@@ -1,10 +1,23 @@
 import React, { useState } from 'react';
-import { TextField, Button, Typography, Box, Paper, IconButton, InputAdornment, FormControl, InputLabel, OutlinedInput, useTheme } from '@mui/material';
+import {
+    TextField,
+    Button,
+    Typography,
+    Box,
+    Paper,
+    IconButton,
+    InputAdornment,
+    FormControl,
+    InputLabel,
+    OutlinedInput,
+    FormHelperText,
+    useTheme
+} from '@mui/material';
 import { Visibility, VisibilityOff } from '@mui/icons-material';
+import ErrorMessage from '../ErrorMessage/ErrorMessage'; // Asegúrate de tener este componente correctamente implementado
 
-const SignupForm = ({ onSignup, paperElevation, error }) => {
+const SignupForm = ({ onSignup, paperElevation, errors }) => {
     const [credentials, setCredentials] = useState({ username: '', password: '', email: '' });
-    const [validationError, setValidationError] = useState('');
     const [showPassword, setShowPassword] = useState(false);
     const theme = useTheme();
 
@@ -14,39 +27,10 @@ const SignupForm = ({ onSignup, paperElevation, error }) => {
             ...prevCredentials,
             [id]: value
         }));
-
-        // Validar correo electrónico en tiempo real si es necesario
-        if (id === 'email') {
-            if (!value) {
-                setValidationError('El correo electrónico es obligatorio');
-            } else if (!validateEmail(value)) {
-                setValidationError('El formato del correo electrónico no es válido');
-            } else {
-                setValidationError('');
-            }
-        }
-    };
-
-    const validateEmail = (email) => {
-        const re = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-        return re.test(String(email).toLowerCase());
     };
 
     const handleSubmit = (e) => {
         e.preventDefault();
-
-        // Validar una vez más antes de enviar el formulario
-        if (!credentials.email) {
-            setValidationError('El correo electrónico es obligatorio');
-            return;
-        } else if (!validateEmail(credentials.email)) {
-            setValidationError('El formato del correo electrónico no es válido');
-            return;
-        }
-
-        // Limpiar mensaje de error de validación
-        setValidationError('');
-
         // Llamar a la función de registro
         onSignup(credentials);
     };
@@ -59,6 +43,8 @@ const SignupForm = ({ onSignup, paperElevation, error }) => {
         e.preventDefault();
     };
 
+    console.log('Errors:', errors);
+
     return (
         <Paper elevation={paperElevation} style={{ marginBottom: theme.spacing(4) }}>
             <Box p={3}>
@@ -66,20 +52,20 @@ const SignupForm = ({ onSignup, paperElevation, error }) => {
                     Registrarse
                 </Typography>
 
-                {error && (
-                    <Typography variant='body1' color='error' align='center' style={{ marginBottom: theme.spacing(2)}}>
-                        {error}
-                    </Typography>
-                )}
 
-                {validationError && (
-                    <Typography variant='body1' color='error' align='center' style={{ marginBottom: theme.spacing(2)}}>
-                        {validationError}
-                    </Typography>
-                )}
+                {/* Error no contemplado servidor */}
+                {errors.serverSignup && <ErrorMessage message={errors.serverSignup} />} 
 
-                <form onSubmit={handleSubmit}>
-                    <Box mb={3}>
+
+                {errors.validationGeneral && <ErrorMessage message={errors.validationGeneral} />}
+
+
+
+
+                {errors.limitReached && <ErrorMessage message={errors.limitReached} />}
+                
+                <form onSubmit={handleSubmit} noValidate>
+                    <Box mb={2}>
                         <TextField
                             fullWidth
                             id="username"
@@ -87,12 +73,14 @@ const SignupForm = ({ onSignup, paperElevation, error }) => {
                             variant="outlined"
                             value={credentials.username}
                             onChange={handleChange}
-                            
+                            error={!!errors.username || !!errors.serverUniqueUser}
+                            helperText={errors.username || errors.serverUniqueUser}
+                            required
                         />
                     </Box>
 
-                    <Box mb={3}>
-                        <FormControl fullWidth variant="outlined">
+                    <Box mb={2}>
+                        <FormControl fullWidth variant="outlined" error={!!errors.password}>
                             <InputLabel htmlFor="outlined-adornment-password">Contraseña</InputLabel>
                             <OutlinedInput
                                 id="password"
@@ -112,12 +100,14 @@ const SignupForm = ({ onSignup, paperElevation, error }) => {
                                     </InputAdornment>
                                 }
                                 label="Contraseña"
-                                
                             />
+                            {errors.password && (
+                                <FormHelperText>{errors.password}</FormHelperText>
+                            )}
                         </FormControl>
                     </Box>
 
-                    <Box mb={3}>
+                    <Box mb={2}>
                         <TextField
                             fullWidth
                             id="email"
@@ -126,7 +116,9 @@ const SignupForm = ({ onSignup, paperElevation, error }) => {
                             variant="outlined"
                             value={credentials.email}
                             onChange={handleChange}
-                            
+                            error={!!errors.email}
+                            helperText={errors.email}
+                            required
                         />
                     </Box>
 

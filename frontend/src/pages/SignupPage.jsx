@@ -3,16 +3,15 @@ import { Link, useNavigate } from 'react-router-dom';
 import { useAuthService } from '../services/auth.service';
 import { useAuth } from '../contexts/auth.context';
 import SignupForm from '../components/Forms/SignupForm';
-import { Container, Grid, Typography, Link as MuiLink, Paper } from '@mui/material';
+import { Container,Grid,Paper, Typography, Link as MuiLink } from '@mui/material';
 
 function SignupPage() {
-    const [error, setError] = useState('');
     const navigate = useNavigate();
     const { signup } = useAuthService();
     const { user } = useAuth();
     const [paperElevation, setPaperElevation] = useState(1);
-    const formRef = useRef(null); // Referencia al formulario
-
+    const formRef = useRef(null);
+    const [errors, setErrors] = useState({ username: '', password: '', email: '', signupError: '' });
 
     useEffect(() => {
         if (user) {
@@ -21,47 +20,49 @@ function SignupPage() {
     }, [user, navigate]);
 
     useEffect(() => {
-        // Función para manejar el clic fuera del Paper
         const handleClickOutside = (event) => {
             if (formRef.current && !formRef.current.contains(event.target)) {
-                // Si el clic es fuera del Paper, restablece la elevación
                 setPaperElevation(1);
             }
         };
 
-        // Agregar event listener al documento para detectar clics
         document.addEventListener('click', handleClickOutside);
 
-        // Limpiar el event listener al desmontar el componente
         return () => {
             document.removeEventListener('click', handleClickOutside);
         };
     }, []);
 
     const handleClick = () => {
-        // Cambiar la elevación del Paper al hacer clic en el Paper mismo
-        setPaperElevation(8); // Cambia el valor según lo que necesites
+        setPaperElevation(8);
     };
-
-
-
 
     const handleSignup = async (credentials) => {
         try {
             await signup(credentials.username, credentials.password, credentials.email);
+            navigate('/activities');
         } catch (e) {
-            setError(e.message);
+            if (e.validationErrors) {
+                // Si hay errores de validación, actualizarlos en el estado
+                setErrors(e.validationErrors);
+            } else if (e.validationServerErrors) {
+                // Validaciones del servidor concretas como el límite de usuarios
+                setErrors(e.validationServerErrors);
+            }
+            else {
+                setErrors(e.serverErrors);
+            }
         }
     };
 
     return (
-        <Container maxWidth="sm" style={{ marginTop: '5vh' }}>
+        <Container maxWidth="sm" style={{ marginTop: '1vh' }}>
             <Grid container>
                 <Grid item xs={12} ref={formRef} onClick={handleClick}>
-                    <SignupForm onSignup={handleSignup} paperElevation={paperElevation} error={error} />
+                    <SignupForm onSignup={handleSignup} paperElevation={paperElevation} errors={errors} />
 
                     <Paper elevation={paperElevation} style={{ padding: '20px', marginTop: '20px' }} onClick={handleClick}>
-                        <Typography variant="body1" align="center">
+                    <Typography variant="body1" align="center">
                             ¿Ya tienes cuenta? <MuiLink component={Link} to="/login">Inicia sesión aquí</MuiLink>
                         </Typography>
 
@@ -69,6 +70,7 @@ function SignupPage() {
                             Al registrarte, aceptas nuestra <MuiLink component={Link} to="/privacy-policy">política de privacidad</MuiLink>.
                         </Typography>
                     </Paper>
+
                 </Grid>
             </Grid>
         </Container>

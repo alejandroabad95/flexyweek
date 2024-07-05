@@ -35,8 +35,8 @@ X_FRAME_OPTIONS = 'DENY'
 # SECURE_SSL_REDIRECT = True
 
 # Configuración adicional para Celery production
-CELERY_BROKER_URL = os.getenv('PROD_CELERY_BROKER_URL', 'redis://localhost:6379/0')
-CELERY_RESULT_BACKEND = os.getenv('PROD_CELERY_RESULT_BACKEND', 'redis://localhost:6379/0')
+CELERY_BROKER_URL = os.getenv('PROD_CELERY_BROKER_URL', 'PROD_CELERY_BROKER_URL')
+CELERY_RESULT_BACKEND = os.getenv('PROD_CELERY_RESULT_BACKEND', 'PROD_CELERY_RESULT_BACKEND')
 
 
 # Configuración de archivos estáticos

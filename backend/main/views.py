@@ -1,11 +1,13 @@
 from .models import Activity, Event
 from .serializers import ActivitySerializer, EventSerializer
+from rest_framework.exceptions import ValidationError
 from rest_framework import permissions, generics
 from rest_framework.response import Response
 from django.utils import timezone
 from rest_framework import status
 from knox.auth import TokenAuthentication
 from django.db.models import Case, When, Value, BooleanField
+from rest_framework import serializers
 
 
 # ACTIVIDADES
@@ -19,14 +21,76 @@ class ActivityList(generics.ListAPIView):
         # Filtrar las actividades por el usuario autenticado
         return Activity.objects.filter(user=self.request.user)
 
+# class ActivityCreate(generics.CreateAPIView):
+#     serializer_class = ActivitySerializer
+#     permission_classes = [permissions.IsAuthenticated]
+#     authentication_classes = [TokenAuthentication]
+
+#     def perform_create(self, serializer):
+#         # Asignar el usuario autenticado como creador de la actividad
+#         serializer.save(user=self.request.user)
+
+# Intento 1
+# class ActivityCreate(generics.CreateAPIView): 
+#     serializer_class = ActivitySerializer
+#     permission_classes = [permissions.IsAuthenticated]
+#     authentication_classes = [TokenAuthentication]
+
+#     def perform_create(self, serializer):
+#         try:
+#             # Asignar el usuario autenticado como creador de la actividad
+#             serializer.save(user=self.request.user)
+#         except ValidationError as ve:
+#             # Manejo de errores de validación del serializador
+#             return Response(
+#                 {'error': ve.detail},
+#                 status=status.HTTP_400_BAD_REQUEST
+#             )
+#         except Exception as e:
+#             # Manejo de otros errores generales del servidor
+#             return Response(
+#                 {'error': str(e)},
+#                 status=status.HTTP_500_INTERNAL_SERVER_ERROR
+#             )
+
+#         # Si todo va bien, responder con la actividad creada y HTTP 201 Created
+#         return Response(serializer.data, status=status.HTTP_201_CREATED)
+
 class ActivityCreate(generics.CreateAPIView):
     serializer_class = ActivitySerializer
     permission_classes = [permissions.IsAuthenticated]
     authentication_classes = [TokenAuthentication]
 
+    def create(self, request, *args, **kwargs):
+        serializer = self.get_serializer(data=request.data)
+        serializer.is_valid(raise_exception=True)  # Lanza una excepción si el serializador no es válido
+
+        try:
+            self.perform_create(serializer)
+        except serializers.ValidationError as ve:
+            # Manejo de errores de validación del serializador
+            return Response(
+                {'error': ve.detail},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+
+        return Response(serializer.data, status=status.HTTP_201_CREATED)
+
     def perform_create(self, serializer):
-        # Asignar el usuario autenticado como creador de la actividad
         serializer.save(user=self.request.user)
+
+
+
+# class ActivityUpdate(generics.UpdateAPIView):
+#     queryset = Activity.objects.all()
+#     serializer_class = ActivitySerializer
+#     permission_classes = [permissions.IsAuthenticated]
+#     authentication_classes = [TokenAuthentication]
+
+#     def get_queryset(self):
+#         # Filtrar las actividades por el usuario autenticado
+#         return Activity.objects.filter(user=self.request.user)
+    
 
 class ActivityUpdate(generics.UpdateAPIView):
     queryset = Activity.objects.all()
@@ -37,6 +101,44 @@ class ActivityUpdate(generics.UpdateAPIView):
     def get_queryset(self):
         # Filtrar las actividades por el usuario autenticado
         return Activity.objects.filter(user=self.request.user)
+
+    def update(self, request, *args, **kwargs):
+        partial = kwargs.pop('partial', False)
+        instance = self.get_object()
+        serializer = self.get_serializer(instance, data=request.data, partial=partial)
+        serializer.is_valid(raise_exception=True)  # Lanza una excepción si el serializador no es válido
+
+        try:
+            self.perform_update(serializer)
+        except serializers.ValidationError as ve:
+            # Manejo de errores de validación del serializador
+            return Response(
+                {'error': ve.detail},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+        # except Exception as e:
+        #     # Manejo de otros errores generales del servidor
+        #     return Response(
+        #         {'error': str(e)},
+        #         status=status.HTTP_500_INTERNAL_SERVER_ERROR
+        #     )
+
+        return Response(serializer.data, status=status.HTTP_200_OK)
+
+    def perform_update(self, serializer):
+        serializer.save()
+
+
+
+
+
+
+
+
+
+
+
+
     
 class ActivityDelete(generics.DestroyAPIView):
     queryset = Activity.objects.all()

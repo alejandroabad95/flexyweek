@@ -5,7 +5,8 @@ const CreateActivityForm = ({
   newActivityName,
   handleNewActivityNameChange,
   handleAddActivity,
-  newActivityInputRef
+  newActivityInputRef,
+  errors
 }) => (
 
     <ListItem className="adding-activity-item">
@@ -20,7 +21,11 @@ const CreateActivityForm = ({
             handleAddActivity();
           }
         }}
-        sx={{}}
+      sx={{}}
+
+      error={!!errors.nameActivity}
+      helperText={errors.nameActivity}
+
       />
   </ListItem>
   
