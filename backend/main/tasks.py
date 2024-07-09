@@ -1,10 +1,7 @@
 # main_app/tasks.py
 
-from celery import Celery
-from django.utils import timezone
 from .models import Event
-
-app = Celery('flexyweek')
+from celery_config import app
 
 @app.task
 def unmark_completed_events():

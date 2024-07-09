@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import { Dialog, DialogTitle, DialogContent, TextField, DialogActions, Button, ButtonGroup, MenuItem, Select, CircularProgress } from '@mui/material';
+import { Dialog, DialogTitle, DialogContent, TextField, DialogActions, Button, ButtonGroup, MenuItem, Select, CircularProgress, useTheme } from '@mui/material';
 import { getActivities } from '../../services/activity.service';
 
 const CreateEventForm = ({ open, handleClose, day, priority, handleCreateEvent }) => {
@@ -9,6 +9,10 @@ const CreateEventForm = ({ open, handleClose, day, priority, handleCreateEvent }
   const [loading, setLoading] = useState(false);
   const [filteredActivities, setFilteredActivities] = useState([]);
   const [activityTypeFilter, setActivityTypeFilter] = useState(null); // null = todos, 1 = hábitos, 2 = tareas
+
+
+
+  const theme = useTheme();
 
   const filterActivities = useCallback(() => {
     let filtered = activities;
@@ -29,7 +33,6 @@ const CreateEventForm = ({ open, handleClose, day, priority, handleCreateEvent }
           setLoading(false);
         })
         .catch(error => {
-          console.error('Error al cargar actividades:', error.message);
           setLoading(false);
         });
     }
@@ -40,7 +43,6 @@ const CreateEventForm = ({ open, handleClose, day, priority, handleCreateEvent }
   }, [filterActivities]);
 
   const submitForm = () => {
-    console.log('Datos del formulario:', { day, priority, activity, goal });
     handleCreateEvent({ day, priority, activity, goal });
     handleClose();
   };
@@ -89,13 +91,18 @@ const CreateEventForm = ({ open, handleClose, day, priority, handleCreateEvent }
           fullWidth
           value={goal}
           onChange={e => setGoal(e.target.value)}
+
+          // PROVISIONAL
+          error={goal.length > 30}
+          helperText={goal.length > 30 ? "El objetivo no puede tener más de 30 caracteres" : ""}
+
           placeholder="Opcional"
           style={{ marginTop: '1rem' }}
         />
       </DialogContent>
       <DialogActions>
-        <Button onClick={handleClose}>Cancelar</Button>
-        <Button onClick={submitForm}>Crear</Button>
+        <Button onClick={handleClose} style={{ background: theme.palette.icon.gear, color:'white' }}>Cancelar</Button>
+        <Button onClick={submitForm} disabled={goal.length > 30} style={{ background: theme.palette.success.main, color:'white' }} >Aceptar</Button>
       </DialogActions>
     </Dialog>
   );

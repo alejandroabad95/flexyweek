@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import { Dialog, DialogTitle, DialogContent, TextField, DialogActions, Button, ButtonGroup, MenuItem, Select, CircularProgress } from '@mui/material';
+import { Dialog, DialogTitle, DialogContent, TextField, DialogActions, Button, ButtonGroup, MenuItem, Select, CircularProgress, useTheme } from '@mui/material';
 import { getActivities } from '../../services/activity.service';
 
 const UpdateEventForm = ({ open, handleClose, eventData, handleUpdateEvent }) => {
@@ -9,6 +9,8 @@ const UpdateEventForm = ({ open, handleClose, eventData, handleUpdateEvent }) =>
   const [loading, setLoading] = useState(false);
   const [filteredActivities, setFilteredActivities] = useState([]);
   const [activityTypeFilter, setActivityTypeFilter] = useState(null); // null = todos, 1 = hábitos, 2 = tareas
+
+  const theme = useTheme();
 
   const filterActivities = useCallback(() => {
     let filtered = activities;
@@ -96,13 +98,18 @@ const UpdateEventForm = ({ open, handleClose, eventData, handleUpdateEvent }) =>
           fullWidth
           value={goal}
           onChange={e => setGoal(e.target.value)}
+
+          // PROVISIONAL
+          error={goal.length > 30}
+          helperText={goal.length > 30 ? "El objetivo no puede tener más de 30 caracteres" : ""}
+
           placeholder="Opcional"
           style={{ marginTop: '1rem' }}
         />
       </DialogContent>
       <DialogActions>
-        <Button onClick={handleClose}>Cancelar</Button>
-        <Button onClick={submitForm}>Actualizar</Button>
+        <Button onClick={handleClose} style={{ background: theme.palette.icon.gear, color:'white' }}>Cancelar</Button>
+        <Button onClick={submitForm} disabled={goal.length > 30} style={{ background: theme.palette.success.main, color:'white' }}>Actualizar</Button>
       </DialogActions>
     </Dialog>
   );

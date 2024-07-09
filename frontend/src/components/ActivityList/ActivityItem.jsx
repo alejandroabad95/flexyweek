@@ -10,6 +10,7 @@ const ActivityItem = ({ activity, editingActivityId, updatedActivityName, handle
   const theme = useTheme();
   
   const isEditing = editingActivityId === activity.id;
+  
   const isHabit = activity.activity_type === 1;
   const isTask = activity.activity_type === 2;
 
@@ -17,7 +18,7 @@ const ActivityItem = ({ activity, editingActivityId, updatedActivityName, handle
   return(
 
     <Paper elevation={isEditing ? 0 : 4} sx={{
-      margin: '1.2vh',
+      margin: '1.2vh 0',
       border:
         isEditing
         
@@ -73,26 +74,7 @@ const ActivityItem = ({ activity, editingActivityId, updatedActivityName, handle
 
     {isEditing ? (
           <>
-            
-          {/* Edición antigua */}
-            
-        {/* <TextField
-          value={updatedActivityName}
-          onChange={handleUpdatedActivityNameChange}
-          inputRef={editingActivityInputRef}
-          fullWidth
-          onKeyUp={(event) => {
-            if (event.key === 'Enter') {
-              handleSaveUpdatedActivity(activity.id);
-            }
-          }}
-          inputProps={{
-          sx: {
-            fontSize: theme.typography.h4,
-          
-          },
-        }}
-        /> */}
+    
             
         <EditActivityForm
             updatedActivityName={updatedActivityName}

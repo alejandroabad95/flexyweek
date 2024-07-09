@@ -51,7 +51,7 @@ const PlannerPage = () => {
   const handleOpenCreateEventForm = (day, priority) => {
     setSelectedDay(day);
     setSelectedPriority(priority);
-    setOpenCreateEventForm(true);
+    setOpenCreateEventForm(true); // Mantiene abierto el documento
   };
 
 
@@ -304,13 +304,13 @@ const PlannerPage = () => {
       handleTouchMove={handleTouchMove}
       handleTouchEnd={handleTouchEnd}
       handleShowMenu={handleShowMenu}
-        showMenu={showMenu}
-       
+      showMenu={showMenu}
+      handleOpenCreateEventForm={handleOpenCreateEventForm}
       handleOpenUpdateEventForm={handleOpenUpdateEventForm}
       handleOpenDeleteEventForm={handleOpenDeleteEventForm}
       handleDragOver={handleDragOver}
       handleDrop={handleDrop}
-      handleOpenCreateEventForm={handleOpenCreateEventForm}
+      
       
       />
       
@@ -330,11 +330,12 @@ const PlannerPage = () => {
       handleShowMenu={handleShowMenu}
       showMenu={showMenu}
 
+      handleOpenCreateEventForm={handleOpenCreateEventForm}
       handleOpenUpdateEventForm={handleOpenUpdateEventForm}
       handleOpenDeleteEventForm={handleOpenDeleteEventForm}
       handleDragOver={handleDragOver}
       handleDrop={handleDrop}
-      handleOpenCreateEventForm={handleOpenCreateEventForm}
+      
       isDragging={isDragging}
     />
 
