@@ -67,7 +67,7 @@ const theme = createTheme({
 
 
   typography: {
-    fontFamily: '"Roboto", "Helvetica", "Arial", sans-serif',
+    fontFamily: ' "Verdan",sans-serif ',
     fontSize: 16,  // Tamaño de fuente base
     body1: {
       fontSize: '0.7rem'
