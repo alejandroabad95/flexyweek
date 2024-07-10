@@ -112,19 +112,58 @@ const updateEventDay = async (eventId, direction) => {
     }
 };
 
+// Función para actualizar la posición de un evento
+// const updateEventPosition = async (event1Id, event2Id) => {
+//   setToken();
+//   try {
+//     const response = await axiosInstance.put('/events/update-position/', {
+//       event1Id: event1Id,
+//       event2Id: event2Id,
+//     });
+//     return response.data;
+//   } catch (error) {
+//     throw new Error(`Hubo un problema al intercambiar los eventos`);
+//   }
+// };
 
-const updateEventPosition = async (event1Id, event2Id) => {
-  setToken();
-  try {
-    const response = await axiosInstance.put('/events/update-position/', {
-      event1Id: event1Id,
-      event2Id: event2Id,
-    });
-    return response.data;
-  } catch (error) {
-    throw new Error(`Hubo un problema al intercambiar los eventos`);
-  }
+
+//////////////////////////////////////////////////////////////////
+// Función para actualizar la posición de un evento
+//////////////////////////////////////////////////////////////////
+
+const updateEventPosition = async (event1Id, event2Id, newDay, newPriority) => {
+    setToken();
+    try {
+        const response = await axiosInstance.put('/events/update-position/', {
+            event1Id: event1Id,
+            event2Id: event2Id,
+            day: newDay,
+            priority: newPriority,
+        });
+        return response.data;
+    } catch (error) {
+        throw new Error('Hubo un problema al intercambiar los eventos o actualizar la posición del evento');
+    }
 };
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 

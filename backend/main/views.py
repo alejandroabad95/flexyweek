@@ -363,6 +363,37 @@ class ToggleEventDay(generics.UpdateAPIView):  # Cambia a UpdateAPIView
 
 
 # NUEVOOOOOOOOOOOOOO
+# class UpdateEventPosition(generics.UpdateAPIView):
+#     queryset = Event.objects.all()
+#     serializer_class = EventSerializer
+#     permission_classes = [permissions.IsAuthenticated]
+#     authentication_classes = [TokenAuthentication]
+
+#     def update(self, request, *args, **kwargs):
+#         event1_id = request.data.get('event1Id')
+#         event2_id = request.data.get('event2Id')
+
+#         try:
+#             event1 = Event.objects.get(pk=event1_id)
+#             event2 = Event.objects.get(pk=event2_id)
+
+#             # Realizar el intercambio de días y prioridades
+#             event1.day, event2.day = event2.day, event1.day
+#             event1.priority, event2.priority = event2.priority, event1.priority
+
+#             event1.save()
+#             event2.save()
+
+#             serializer1 = self.get_serializer(event1)
+#             serializer2 = self.get_serializer(event2)
+
+#             return Response({'event1': serializer1.data, 'event2': serializer2.data})
+#         except Exception as e:
+#             return Response({'error': str(e)}, status=status.HTTP_400_BAD_REQUEST)
+
+
+############################################################################################################
+############################################################################################################ 
 class UpdateEventPosition(generics.UpdateAPIView):
     queryset = Event.objects.all()
     serializer_class = EventSerializer
@@ -372,24 +403,77 @@ class UpdateEventPosition(generics.UpdateAPIView):
     def update(self, request, *args, **kwargs):
         event1_id = request.data.get('event1Id')
         event2_id = request.data.get('event2Id')
+        new_day = request.data.get('day')
+        new_priority = request.data.get('priority')
 
         try:
-            event1 = Event.objects.get(pk=event1_id)
-            event2 = Event.objects.get(pk=event2_id)
+            if event1_id and event2_id:
+                event1 = Event.objects.get(pk=event1_id)
+                event2 = Event.objects.get(pk=event2_id)
+                
+                # Intercambiar posiciones
+                event1.day, event2.day = event2.day, event1.day
+                event1.priority, event2.priority = event2.priority, event1.priority
+                
+                event1.save()
+                event2.save()
 
-            # Realizar el intercambio de días y prioridades
-            event1.day, event2.day = event2.day, event1.day
-            event1.priority, event2.priority = event2.priority, event1.priority
+                serializer1 = self.get_serializer(event1)
+                serializer2 = self.get_serializer(event2)
+                return Response({
+                    'event1': serializer1.data,
+                    'event2': serializer2.data
+                })
+            elif event1_id and new_day is not None and new_priority is not None:
+                event1 = Event.objects.get(pk=event1_id)
+                event1.day = new_day
+                event1.priority = new_priority
+                event1.save()
 
-            event1.save()
-            event2.save()
-
-            serializer1 = self.get_serializer(event1)
-            serializer2 = self.get_serializer(event2)
-
-            return Response({'event1': serializer1.data, 'event2': serializer2.data})
+                serializer = self.get_serializer(event1)
+                return Response(serializer.data)
+            else:
+                return Response({'error': 'Invalid request'}, status=status.HTTP_400_BAD_REQUEST)
+        except Event.DoesNotExist:
+            return Response({'error': 'Event not found'}, status=status.HTTP_404_NOT_FOUND)
         except Exception as e:
             return Response({'error': str(e)}, status=status.HTTP_400_BAD_REQUEST)
+        
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 

@@ -56,12 +56,9 @@ const EventTable = ({ WeekHeaders, Week, priorityLevels, numColumnsWeek, filterE
                           handleDragOver={handleDragOver}
                           handleDrop={handleDrop}
 
-                         
-                         
 
                         />
                       ))
-
 
                     )
                       
@@ -74,12 +71,14 @@ const EventTable = ({ WeekHeaders, Week, priorityLevels, numColumnsWeek, filterE
                           day={day}
                           priority={priority}
                           handleOpenCreateEventForm={handleOpenCreateEventForm}
+                          handleDragOver={handleDragOver}
+                          //Soltar en paper vacío
+                          handleDrop={handleDrop}
+                          handleTouchEnd={handleTouchEnd}
                         />
                       )
                     )
                       
-                    
-                    
                     }
                   </TableCell>
                 ))}

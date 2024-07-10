@@ -168,6 +168,37 @@ const PlannerPage = () => {
 
 ///////////////////////////////////////////////////////////////////////////////
   
+  // const handleTouchEnd = async () => {
+  //   if (draggedEvent) {
+  //     const element = document.elementFromPoint(draggedEventPosition.x, draggedEventPosition.y);
+  //     if (element && element.closest('td')) {
+  //       const day = element.closest('td').getAttribute('data-day');
+  //       const priority = element.closest('td').getAttribute('data-priority');
+  //       if (day && priority) {
+  //         console.log(draggedEvent.id, 'Evento soltado en el día:', day, 'con prioridad:', priority);
+          
+  //         const filterEvent = events.filter((event) => (event.day === day && event.priority === Number(priority)))
+  //         const targetEvent = filterEvent[0]
+        
+
+  //         try {
+  //           await updateEventPosition(draggedEvent.id, targetEvent.id);
+  //           console.log('Posiciones de los eventos actualizadas con éxito.');
+  //           fetchEvents();  // Recargar eventos para reflejar los cambios
+  //       } catch (error) {
+  //           console.error('Hubo un problema al actualizar las posiciones de los eventos:', error.message);
+  //       }
+        
+  //       }
+
+
+  //     }
+  //     setDraggedEvent(null);
+  //   }
+  //   setIsDragging(false);
+  // };
+
+
   const handleTouchEnd = async () => {
     if (draggedEvent) {
       const element = document.elementFromPoint(draggedEventPosition.x, draggedEventPosition.y);
@@ -176,22 +207,20 @@ const PlannerPage = () => {
         const priority = element.closest('td').getAttribute('data-priority');
         if (day && priority) {
           console.log(draggedEvent.id, 'Evento soltado en el día:', day, 'con prioridad:', priority);
-          
-          const filterEvent = events.filter((event) => (event.day === day && event.priority === Number(priority)))
-          const targetEvent = filterEvent[0]
-        
-
+          const filterEvent = events.filter((event) => event.day === day && event.priority === Number(priority));
+          const targetEvent = filterEvent[0];
           try {
-            await updateEventPosition(draggedEvent.id, targetEvent.id);
+            if (targetEvent) {
+              await updateEventPosition(draggedEvent.id, targetEvent.id);
+            } else {
+              await updateEventPosition(draggedEvent.id, null, day, priority);
+            }
             console.log('Posiciones de los eventos actualizadas con éxito.');
-            fetchEvents();  // Recargar eventos para reflejar los cambios
-        } catch (error) {
+            fetchEvents();
+          } catch (error) {
             console.error('Hubo un problema al actualizar las posiciones de los eventos:', error.message);
+          }
         }
-        
-        }
-
-
       }
       setDraggedEvent(null);
     }
@@ -199,31 +228,79 @@ const PlannerPage = () => {
   };
 
 
-
-  const handleDrop = async (e, targetEvent) => {
-    e.preventDefault();
+  // const handleDrop = async (e, targetEvent) => {
+  //   e.preventDefault();
    
+  //   let draggedEventData;
+  //   if (e.dataTransfer) {
+  //       draggedEventData = JSON.parse(e.dataTransfer.getData('eventData'));
+  //   } else {
+  //       draggedEventData = draggedEvent;
+  //   }
+
+  //   if (draggedEventData && targetEvent) {
+  //       try {
+  //           await updateEventPosition(draggedEventData.id, targetEvent.id);
+  //           console.log('Posiciones de los eventos actualizadas con éxito.');
+  //           fetchEvents();  // Recargar eventos para reflejar los cambios
+  //       } catch (error) {
+  //           console.error('Hubo un problema al actualizar las posiciones de los eventos:', error.message);
+  //       }
+  //   } else {
+  //       console.error('Datos insuficientes para actualizar las posiciones de los eventos.');
+  //   }
+  //   setDraggedEvent(null);
+  //   setIsDragging(false);
+  // };
+  
+
+  const handleDrop = async (e, targetEvent, day, priority) => {
+    e.preventDefault();
     let draggedEventData;
+
     if (e.dataTransfer) {
-        draggedEventData = JSON.parse(e.dataTransfer.getData('eventData'));
+      draggedEventData = JSON.parse(e.dataTransfer.getData('eventData'));
     } else {
-        draggedEventData = draggedEvent;
+      draggedEventData = draggedEvent;
     }
 
-    if (draggedEventData && targetEvent) {
-        try {
-            await updateEventPosition(draggedEventData.id, targetEvent.id);
-            console.log('Posiciones de los eventos actualizadas con éxito.');
-            fetchEvents();  // Recargar eventos para reflejar los cambios
-        } catch (error) {
-            console.error('Hubo un problema al actualizar las posiciones de los eventos:', error.message);
+    if (draggedEventData) {
+      try {
+        if (targetEvent) {
+          await updateEventPosition(draggedEventData.id, targetEvent.id);
+        } else {
+      
+          if (day !== null && priority !== null) {
+            console.log('entro aquí????')
+            await updateEventPosition(draggedEventData.id, null, day, priority);
+
+
+          } else {
+
+            console.error('Día y/o prioridad no válidos:', day, priority);
+          }
+
         }
+        console.log('Posiciones de los eventos actualizadas con éxito.');
+        fetchEvents();
+      } catch (error) {
+        console.error('Hubo un problema al actualizar las posiciones de los eventos:', error.message);
+      }
     } else {
-        console.error('Datos insuficientes para actualizar las posiciones de los eventos.');
+      console.error('Datos insuficientes para actualizar las posiciones de los eventos.');
     }
+
     setDraggedEvent(null);
     setIsDragging(false);
-};
+  };
+
+
+
+
+
+
+
+
 
 
   // const handleDrop = async (event, day, priority) => {

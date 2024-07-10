@@ -24,6 +24,7 @@ const EventPaper = ({event, handleShowMenu, showMenu  ,handleOpenUpdateEventForm
 
       onDragStart={(e) => handleDragStart(e, event)} // Maneja el inicio del arrastre, pasando el evento y el objeto de evento como parámetros
       onDragOver={(e) => handleDragOver(e)} // Maneja el evento de arrastre sobre el elemento
+      
       onDrop={(e) => handleDrop(e, event)} // Maneja el evento de soltar el elemento en este componente, pasando el evento y el objeto de evento como parámetros
 
       onTouchStart={(e) => handleTouchStart(e, event)} // Maneja el inicio del toque en el elemento, pasando el evento y el objeto de evento como parámetros

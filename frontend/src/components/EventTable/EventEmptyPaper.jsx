@@ -5,19 +5,24 @@ import AddBoxIcon from '@mui/icons-material/AddBox';
 const EventEmptyPaper = ({
   day,
   priority,
-  // handleDragOver,
-  // handleDrop,
-  handleOpenCreateEventForm
+  handleOpenCreateEventForm,
+  handleDragOver,
+  handleDrop,
+  handleTouchEnd
+ 
 }) => {
+
+
+
   return (
     <Paper
       
-      // Eventos para soltar elementos
+      onDragOver={handleDragOver} // permite soltar
 
-      // onDragOver={(e) => handleDragOver(e)}
-      // onDrop={(e) => handleDrop(e, day, priority)}
-      
-      onTouchEnd={(e) => handleOpenCreateEventForm(day, priority)}
+      onDrop={(e) => handleDrop(e, null, day, priority)}
+
+      onTouchEnd={() => handleTouchEnd(day, priority)}
+      // onTouchEnd={(e) => handleOpenCreateEventForm(day, priority)}
 
 
       sx={{
