@@ -6,7 +6,7 @@ from .base import *
 SECRET_KEY = os.getenv('SECRET_KEY', 'SECRET_KEY')
 
 # Desactivar el modo de depuración en producción
-DEBUG = False
+DEBUG = True
 
 # Establecer hosts permitidos en el entorno de producción
 ALLOWED_HOSTS = os.getenv('ALLOWED_HOSTS', '').split(',')
